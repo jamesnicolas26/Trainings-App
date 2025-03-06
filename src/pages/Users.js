@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const Users = ({ users, deleteUser }) => {
+const Users = ({ deleteUser }) => {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    // Fetch users from local storage
+    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+    setUsers(storedUsers);
+  }, []);
+
   return (
     <div>
       <h1>Registered Users</h1>
@@ -16,7 +24,7 @@ const Users = ({ users, deleteUser }) => {
               <th>Office</th>
               <th>Username</th>
               <th>Email</th>
-              <th>Actions</th> {/* Column for delete and edit buttons */}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -31,15 +39,15 @@ const Users = ({ users, deleteUser }) => {
                 <td>{user.email}</td>
                 <td>
                   <button
-                    onClick={() =>
-                      window.confirm("Are you sure you want to delete this user?") &&
-                      deleteUser(index)
-                    }
+                    onClick={() => {
+                      if (window.confirm("Are you sure you want to delete this user?")) {
+                        deleteUser(index);
+                      }
+                    }}
                     style={{ marginRight: "10px" }}
                   >
                     Delete
                   </button>
-                  {/* Added Edit button */}
                   <Link to={`/edituser/${index}`}>
                     <button>Edit</button>
                   </Link>

@@ -1,22 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import * as XLSX from "xlsx"; // Import the XLSX library for handling Excel files
+import * as XLSX from "xlsx";
 
 const Trainings = ({ trainings, deleteTraining }) => {
-  const imgContainerStyle = {
-    maxWidth: "200px",
-    maxHeight: "200px",
-    overflow: "hidden",
-    borderRadius: "5px",
-  };
-
   const imgStyle = {
-    width: "100%",
-    height: "auto",
-    objectFit: "contain", // Ensures the image fits properly without distortion.
+    width: "100px",
+    height: "100px",
+    objectFit: "fill",
+    borderRadius: "5px",
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
   };
 
-  // Function to export trainings data to an Excel file
+  const handleImageError = (e) => {
+    e.target.src = "path/to/default-image.jpg"; // Replace with a default image path
+  };
+
   const exportToExcel = () => {
     const data = trainings.map((training) => ({
       Title: training.title,
@@ -25,25 +23,27 @@ const Trainings = ({ trainings, deleteTraining }) => {
       "End Date": training.endDate,
       Hours: training.hours,
       Sponsor: training.sponsor,
-      Certificate: training.certificate ? "Yes" : "No", // Indicate if a certificate is available
+      Author: `${training.author}${training.office ? ` (${training.office})` : ""}`,
+      Certificate: training.certificate ? "Yes" : "No",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
 
     const columnWidths = Object.keys(data[0] || {}).map((key) => {
       const maxLength = Math.max(
-        key.length, // Header length
-        ...data.map((row) => (row[key] ? row[key].toString().length : 0)) // Max length of column data
+        key.length,
+        ...data.map((row) => (row[key] ? row[key].toString().length : 0))
       );
-      return { wch: maxLength + 2 }; // Add padding for better appearance
+      return { wch: maxLength + 2 };
     });
-  
-    worksheet["!cols"] = columnWidths; // Set calculated widths
+
+    worksheet["!cols"] = columnWidths;
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Trainings");
 
-    XLSX.writeFile(workbook, "trainings.xlsx");
+    const timestamp = new Date().toISOString().replace(/[-:T]/g, "_").split(".")[0];
+    XLSX.writeFile(workbook, `trainings_${timestamp}.xlsx`);
   };
 
   return (
@@ -112,16 +112,18 @@ const Trainings = ({ trainings, deleteTraining }) => {
                 <td>{training.endDate}</td>
                 <td>{training.hours}</td>
                 <td>{training.sponsor}</td>
-                <td>{training.author}</td>
+                <td>
+                  {training.author}
+                  {training.office ? ` (${training.office})` : ""}
+                </td>
                 <td>
                   {training.certificate ? (
-                    <div style={imgContainerStyle}>
-                      <img
-                        src={training.certificate}
-                        alt="Certificate"
-                        style={imgStyle}
-                      />
-                    </div>
+                    <img
+                      src={training.certificate}
+                      alt="Certificate"
+                      style={imgStyle}
+                      onError={handleImageError}
+                    />
                   ) : (
                     "No image"
                   )}
