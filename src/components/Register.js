@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Register = ({ addUser }) => {
   const navigate = useNavigate();
@@ -264,6 +265,10 @@ const Register = ({ addUser }) => {
               placeholder="Re-enter your password"
             />
           </div>
+        </div>
+
+        <div style={{ textAlign: "left" }}>
+        <p>Already have an account? <Link to="/">Login</Link></p>
         </div>
 
         <div style={{ textAlign: "right" }}>

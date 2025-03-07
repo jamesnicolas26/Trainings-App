@@ -52,20 +52,6 @@ function Home() {
           Users
         </Link>
         <Link
-          to="/"
-          style={{
-            padding: "10px 15px",
-            margin: "10px",
-            backgroundColor: "#ef4444",
-            color: "#fff",
-            textDecoration: "none",
-            borderRadius: "5px",
-            fontWeight: "bold",
-          }}
-        >
-          Login
-        </Link>
-        <Link
           to="/register"
           style={{
             padding: "10px 15px",
@@ -78,6 +64,19 @@ function Home() {
           }}
         >
           Register
+        </Link>
+        <Link
+          to="/logout"
+          style={{
+            color: "#fff",
+            textDecoration: "none",
+            backgroundColor: "#e74c3c",
+            padding: "10px 15px",
+            margin: "10px",
+            borderRadius: "5px",
+          }}
+        >
+          Logout
         </Link>
       </nav>
       <div style={{ fontSize: "0.9rem", color: "#6b7280" }}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Trainings from "./pages/Trainings";
 import Users from "./pages/Users";
@@ -7,6 +7,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import AddTraining from "./components/AddTraining";
 import EditUser from "./components/EditUser"; // Import EditUser component
+import Logout from "./components/Logout"; // Import Logout component
+import PrivateRoute from "./Auth/PrivateRoute"; // Import PrivateRoute component
 
 export default function App() {
   const [users, setUsers] = useState(() => {
@@ -28,6 +30,8 @@ export default function App() {
       return [];
     }
   });
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
 
   useEffect(() => {
     try {
@@ -69,24 +73,70 @@ export default function App() {
     setTrainings((prevTrainings) => prevTrainings.filter((_, i) => i !== index));
   };
 
+  const login = () => {
+    setIsAuthenticated(true);
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+  };
+
   return (
-    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login users={users} />} />
-        <Route path="/home" element={<Home />} />
+        <Route
+          path="/"
+          element={<Login users={users} onLogin={login} />} // Pass login function to Login
+        />
+        <Route
+          path="/home"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <Home />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/trainings"
-          element={<Trainings trainings={trainings} deleteTraining={deleteTraining} />}
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <Trainings trainings={trainings} deleteTraining={deleteTraining} />
+            </PrivateRoute>
+          }
         />
-        <Route path="/addtraining" element={<AddTraining addTraining={addTraining} />} />
-        <Route path="/users" element={<Users users={users} deleteUser={deleteUser} />} />
+        <Route
+          path="/addtraining"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AddTraining addTraining={addTraining} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <Users users={users} deleteUser={deleteUser} />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/edituser/:id"
-          element={<EditUser users={users} updateUser={updateUser} />} // Add EditUser route
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <EditUser users={users} updateUser={updateUser} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/logout"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <Logout onLogout={logout} />
+            </PrivateRoute>
+          }
         />
         <Route path="/register" element={<Register addUser={addUser} />} />
         <Route path="*" element={<div>404 - Page Not Found</div>} />
       </Routes>
-    </BrowserRouter>
   );
 }

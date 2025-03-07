@@ -18,9 +18,7 @@ const Users = ({ deleteUser }) => {
           <thead>
             <tr>
               <th>Title</th>
-              <th>Last Name</th>
-              <th>First Name</th>
-              <th>Middle Name</th>
+              <th>Name</th>
               <th>Office</th>
               <th>Username</th>
               <th>Email</th>
@@ -31,9 +29,7 @@ const Users = ({ deleteUser }) => {
             {users.map((user, index) => (
               <tr key={index}>
                 <td>{user.title}</td>
-                <td>{user.lastname}</td>
-                <td>{user.firstname}</td>
-                <td>{user.middlename}</td>
+                <td>{`${user.firstname} ${user.middlename} ${user.lastname}`}</td>
                 <td>{user.office}</td>
                 <td>{user.username}</td>
                 <td>{user.email}</td>

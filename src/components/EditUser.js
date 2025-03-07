@@ -161,22 +161,38 @@ const EditUser = ({ users, updateUser }) => {
               }}
             />
           </div>
-          <button
-            type="submit"
-            style={{
-              backgroundColor: "#3498db",
-              color: "#fff",
-              padding: "0.8rem 1.5rem",
-              borderRadius: "5px",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "1rem",
-              display: "block",
-              margin: "0 auto",
-            }}
-          >
-            Save Changes
-          </button>
+
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
+            <button
+              type="submit"
+              style={{
+                backgroundColor: "#3498db",
+                color: "#fff",
+                padding: "0.8rem 1.5rem",
+                borderRadius: "5px",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "1rem",
+              }}
+            >
+              Save Changes
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/users")}
+              style={{
+                backgroundColor: "#e74c3c",
+                color: "#fff",
+                padding: "0.8rem 1.5rem",
+                borderRadius: "5px",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "1rem",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </div>
