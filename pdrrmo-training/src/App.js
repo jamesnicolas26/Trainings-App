@@ -6,9 +6,10 @@ import Users from "./pages/Users";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import AddTraining from "./components/AddTraining";
-import EditUser from "./components/EditUser"; // Import EditUser component
-import Logout from "./components/Logout"; // Import Logout component
-import PrivateRoute from "./Auth/PrivateRoute"; // Import PrivateRoute component
+import EditUser from "./components/EditUser";
+import Logout from "./components/Logout";
+import PrivateRoute from "./Auth/PrivateRoute";
+import { AuthProvider } from "./Auth/AuthContext"; // Ensure AuthProvider is wrapping the app
 
 export default function App() {
   const [users, setUsers] = useState(() => {
@@ -30,8 +31,6 @@ export default function App() {
       return [];
     }
   });
-
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
 
   useEffect(() => {
     try {
@@ -73,24 +72,14 @@ export default function App() {
     setTrainings((prevTrainings) => prevTrainings.filter((_, i) => i !== index));
   };
 
-  const login = () => {
-    setIsAuthenticated(true);
-  };
-
-  const logout = () => {
-    setIsAuthenticated(false);
-  };
-
   return (
+    <AuthProvider>
       <Routes>
-        <Route
-          path="/"
-          element={<Login users={users} onLogin={login} />} // Pass login function to Login
-        />
+        <Route path="/" element={<Login />} />
         <Route
           path="/home"
           element={
-            <PrivateRoute isAuthenticated={isAuthenticated}>
+            <PrivateRoute>
               <Home />
             </PrivateRoute>
           }
@@ -98,7 +87,7 @@ export default function App() {
         <Route
           path="/trainings"
           element={
-            <PrivateRoute isAuthenticated={isAuthenticated}>
+            <PrivateRoute>
               <Trainings trainings={trainings} deleteTraining={deleteTraining} />
             </PrivateRoute>
           }
@@ -106,7 +95,7 @@ export default function App() {
         <Route
           path="/addtraining"
           element={
-            <PrivateRoute isAuthenticated={isAuthenticated}>
+            <PrivateRoute>
               <AddTraining addTraining={addTraining} />
             </PrivateRoute>
           }
@@ -114,7 +103,7 @@ export default function App() {
         <Route
           path="/users"
           element={
-            <PrivateRoute isAuthenticated={isAuthenticated}>
+            <PrivateRoute>
               <Users users={users} deleteUser={deleteUser} />
             </PrivateRoute>
           }
@@ -122,7 +111,7 @@ export default function App() {
         <Route
           path="/edituser/:id"
           element={
-            <PrivateRoute isAuthenticated={isAuthenticated}>
+            <PrivateRoute>
               <EditUser users={users} updateUser={updateUser} />
             </PrivateRoute>
           }
@@ -130,13 +119,17 @@ export default function App() {
         <Route
           path="/logout"
           element={
-            <PrivateRoute isAuthenticated={isAuthenticated}>
-              <Logout onLogout={logout} />
+            <PrivateRoute>
+              <Logout />
             </PrivateRoute>
           }
         />
-        <Route path="/register" element={<Register addUser={addUser} />} />
+        <Route
+          path="/register"
+          element={<Register addUser={addUser} />} // Public route
+        />
         <Route path="*" element={<div>404 - Page Not Found</div>} />
       </Routes>
+    </AuthProvider>
   );
 }

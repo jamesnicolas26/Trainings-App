@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-const Register = ({ addUser }) => {
+const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
@@ -17,6 +17,7 @@ const Register = ({ addUser }) => {
   });
 
   const [offices, setOffices] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchOffices = async () => {
@@ -60,8 +61,8 @@ const Register = ({ addUser }) => {
         "Bulacan State University",
         "Save the Children Philippines Luzon Program",
       ];
-      setOffices(officeList);
-    };
+      setOffices(officeList); // Populate the dropdown menu
+    };    
 
     fetchOffices();
   }, []);
@@ -70,26 +71,97 @@ const Register = ({ addUser }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const {
+      title,
+      lastname,
+      firstname,
+      office,
+      username,
+      email,
+      password,
+      confirmPassword,
+    } = formData;
+
+    if (
+      !title ||
+      !lastname ||
+      !firstname ||
+      !office ||
+      !username ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
+      alert("All fields are required.");
+      return false;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Invalid email format!");
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+  
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
+      setIsLoading(false);
       return;
     }
-    addUser(formData);
-    alert("User registered successfully!");
-    setFormData({
-      title: "",
-      lastname: "",
-      firstname: "",
-      middlename: "",
-      office: "",
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    });
-    navigate("/users");
+  
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      alert("Invalid email format!");
+      setIsLoading(false);
+      return;
+    }
+  
+    console.log("Form data being sent to backend:", formData); // Debugging log
+  
+    try {
+      const response = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert("User registered successfully!");
+        setFormData({
+          title: "",
+          lastname: "",
+          firstname: "",
+          middlename: "",
+          office: "",
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        navigate("/");
+      } else {
+        alert(data.message || "Registration failed. Please try again.");
+      }
+    } catch (error) {
+      alert("An error occurred. Please try again later.");
+      console.error("Error during registration:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const containerStyle = {
@@ -117,11 +189,11 @@ const Register = ({ addUser }) => {
 
   const buttonStyle = {
     padding: "10px 20px",
-    backgroundColor: "#007bff",
+    backgroundColor: isLoading ? "#6c757d" : "#007bff",
     color: "#fff",
     border: "none",
     borderRadius: "4px",
-    cursor: "pointer",
+    cursor: isLoading ? "not-allowed" : "pointer",
   };
 
   const gridStyle = {
@@ -139,7 +211,8 @@ const Register = ({ addUser }) => {
           {/* Title */}
           <div>
             <label style={labelStyle}>Title</label>
-            <select required
+            <select
+              required
               name="title"
               value={formData.title}
               onChange={handleChange}
@@ -161,7 +234,8 @@ const Register = ({ addUser }) => {
           {/* Last Name */}
           <div>
             <label style={labelStyle}>Last Name</label>
-            <input required
+            <input
+              required
               type="text"
               name="lastname"
               value={formData.lastname}
@@ -174,7 +248,8 @@ const Register = ({ addUser }) => {
           {/* First Name */}
           <div>
             <label style={labelStyle}>First Name</label>
-            <input required
+            <input
+              required
               type="text"
               name="firstname"
               value={formData.firstname}
@@ -200,7 +275,8 @@ const Register = ({ addUser }) => {
           {/* Office */}
           <div style={{ gridColumn: "span 2" }}>
             <label style={labelStyle}>Office</label>
-            <select required
+            <select
+              required
               name="office"
               value={formData.office}
               onChange={handleChange}
@@ -220,7 +296,8 @@ const Register = ({ addUser }) => {
         <div style={gridStyle}>
           <div>
             <label style={labelStyle}>Username</label>
-            <input required
+            <input
+              required
               type="text"
               name="username"
               value={formData.username}
@@ -232,7 +309,8 @@ const Register = ({ addUser }) => {
 
           <div>
             <label style={labelStyle}>Email</label>
-            <input required
+            <input
+              required
               type="email"
               name="email"
               value={formData.email}
@@ -244,7 +322,8 @@ const Register = ({ addUser }) => {
 
           <div>
             <label style={labelStyle}>Password</label>
-            <input required
+            <input
+              required
               type="password"
               name="password"
               value={formData.password}
@@ -256,7 +335,8 @@ const Register = ({ addUser }) => {
 
           <div>
             <label style={labelStyle}>Confirm Password</label>
-            <input required
+            <input
+              required
               type="password"
               name="confirmPassword"
               value={formData.confirmPassword}
@@ -268,12 +348,14 @@ const Register = ({ addUser }) => {
         </div>
 
         <div style={{ textAlign: "left" }}>
-        <p>Already have an account? <Link to="/">Login</Link></p>
+          <p>
+            Already have an account? <Link to="/">Login</Link>
+          </p>
         </div>
 
         <div style={{ textAlign: "right" }}>
-          <button type="submit" style={buttonStyle}>
-            Register
+          <button type="submit" style={buttonStyle} disabled={isLoading}>
+            {isLoading ? "Registering..." : "Register"}
           </button>
         </div>
       </form>
