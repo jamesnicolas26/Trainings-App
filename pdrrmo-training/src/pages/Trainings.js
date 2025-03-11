@@ -7,6 +7,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
   const [filterType, setFilterType] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [selectedCertificate, setSelectedCertificate] = useState(null);
 
   const imgStyle = {
     width: "100px",
@@ -14,6 +15,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
     objectFit: "fill",
     borderRadius: "5px",
     boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+    cursor: "pointer",
   };
 
   const handleImageError = (e) => {
@@ -199,6 +201,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
                       alt="Certificate"
                       style={imgStyle}
                       onError={handleImageError}
+                      onClick={() => setSelectedCertificate(training.certificate)}
                     />
                   ) : (
                     "No image"
@@ -228,6 +231,35 @@ const Trainings = ({ trainings, deleteTraining }) => {
         </table>
       ) : (
         <p>No trainings available.</p>
+      )}
+
+      {selectedCertificate && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setSelectedCertificate(null)}
+        >
+          <img
+            src={selectedCertificate}
+            alt="Certificate"
+            style={{
+              maxWidth: "90%",
+              maxHeight: "90%",
+              borderRadius: "10px",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.5)",
+            }}
+          />
+        </div>
       )}
     </div>
   );
