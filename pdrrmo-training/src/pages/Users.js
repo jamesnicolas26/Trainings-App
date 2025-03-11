@@ -6,7 +6,6 @@ const Users = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Fetch users from the backend
     const fetchUsers = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/users");
@@ -15,7 +14,6 @@ const Users = () => {
         }
         const data = await response.json();
 
-        // Ensure the data contains the necessary fields
         const formattedUsers = data.map((user) => ({
           _id: user._id,
           title: user.title || "",
@@ -49,7 +47,7 @@ const Users = () => {
         throw new Error(`Error ${response.status}: Unable to delete user.`);
       }
 
-      setUsers(users.filter((user) => user._id !== id)); // Update state to remove deleted user
+      setUsers(users.filter((user) => user._id !== id));
       alert("User deleted successfully.");
     } catch (err) {
       console.error(err);
@@ -58,42 +56,70 @@ const Users = () => {
   };
 
   return (
-    <div style={{ padding: "40px" }}>
-      <h1>Registered Users</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", color: "#333" }}>
+    <br />
+    <br />
+      <h1 style={{ textAlign: "center", color: "#444" }}>Registered Users</h1>
+      {error && <p style={{ color: "#d9534f", textAlign: "center" }}>{error}</p>}
       {users.length > 0 ? (
-        <table border="1" style={{ width: "100%", textAlign: "left" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            marginTop: "20px",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+          }}
+        >
           <thead>
-            <tr>
-              <th>Title</th>
-              <th>Lastname</th>
-              <th>Firstname</th>
-              <th>Middlename</th>
-              <th>Office</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Actions</th>
+            <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
+              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Title</th>
+              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Lastname</th>
+              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Firstname</th>
+              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Middlename</th>
+              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Office</th>
+              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Username</th>
+              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Email</th>
+              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user.title}</td>
-                <td>{user.lastname}</td>
-                <td>{user.firstname}</td>
-                <td>{user.middlename}</td>
-                <td>{user.office}</td>
-                <td>{user.username}</td>
-                <td>{user.email}</td>
-                <td>
+              <tr key={user._id} style={{ borderBottom: "1px solid #ddd" }}>
+                <td style={{ padding: "10px" }}>{user.title}</td>
+                <td style={{ padding: "10px" }}>{user.lastname}</td>
+                <td style={{ padding: "10px" }}>{user.firstname}</td>
+                <td style={{ padding: "10px" }}>{user.middlename}</td>
+                <td style={{ padding: "10px" }}>{user.office}</td>
+                <td style={{ padding: "10px" }}>{user.username}</td>
+                <td style={{ padding: "10px" }}>{user.email}</td>
+                <td style={{ padding: "10px" }}>
                   <button
                     onClick={() => deleteUser(user._id)}
-                    style={{ marginRight: "10px" }}
+                    style={{
+                      padding: "5px 10px",
+                      marginRight: "5px",
+                      backgroundColor: "#d9534f",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "3px",
+                      cursor: "pointer",
+                    }}
                   >
                     Delete
                   </button>
                   <Link to={`/edituser/${user._id}`}>
-                    <button>Edit</button>
+                    <button
+                      style={{
+                        padding: "5px 10px",
+                        backgroundColor: "#5bc0de",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "3px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Edit
+                    </button>
                   </Link>
                 </td>
               </tr>
@@ -101,7 +127,7 @@ const Users = () => {
           </tbody>
         </table>
       ) : (
-        <p>No registered users yet.</p>
+        <p style={{ textAlign: "center", marginTop: "20px" }}>No registered users yet.</p>
       )}
     </div>
   );

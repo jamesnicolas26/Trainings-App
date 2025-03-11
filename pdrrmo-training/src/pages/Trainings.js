@@ -10,11 +10,57 @@ const Trainings = ({ trainings, deleteTraining }) => {
   const [selectedCertificate, setSelectedCertificate] = useState(null);
 
   const imgStyle = {
-    width: "100px",
-    height: "100px",
+    width: "120px",
+    height: "120px",
     objectFit: "fill",
     borderRadius: "5px",
     boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+    cursor: "pointer",
+  };
+
+  const containerStyle = {
+    maxWidth: "1400px",
+    margin: "0 auto",
+    padding: "20px",
+    fontFamily: "Arial, sans-serif",
+  };
+
+  const headerStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: "20px",
+    marginTop: "40px",
+  };
+
+  const buttonStyle = {
+    padding: "10px 15px",
+    marginRight: "10px",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    transition: "background-color 0.3s",
+  };
+
+  const tableStyle = {
+    width: "100%",
+    borderCollapse: "collapse",
+    textAlign: "left",
+    marginBottom: "20px",
+    fontSize: "16px",
+  };
+
+  const thTdStyle = {
+    border: "1px solid #ddd",
+    padding: "15px",
+    fontSize: "15px",
+    textAlign: "center",
+  };
+
+  const rowHoverStyle = {
+    transition: "background-color 0.3s",
     cursor: "pointer",
   };
 
@@ -93,57 +139,42 @@ const Trainings = ({ trainings, deleteTraining }) => {
   };
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "20px",
-          marginTop: "40px",
-        }}
-      >
-        <h1 style={{ alignContent: "center" }}>Trainings</h1>
+    <div style={containerStyle}>
+      <div style={headerStyle}>
+        <h1>Trainings</h1>
         <div>
-          <button
-            onClick={exportToExcel}
-            style={{
-              padding: "10px 15px",
-              marginRight: "10px",
-              backgroundColor: "#008CBA",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
+          <button onClick={exportToExcel} style={buttonStyle}>
             Export to Excel
           </button>
           <Link to="/addtraining">
-            <button
-              style={{
-                padding: "10px 15px",
-                backgroundColor: "#4CAF50",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
+            <button style={{ ...buttonStyle, backgroundColor: "#008CBA" }}>
               Add Training
             </button>
           </Link>
         </div>
       </div>
-      <div style={{ marginBottom: "20px" }}>
+      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
         <input
           type="text"
           placeholder="Search by title..."
           value={searchQuery}
           onChange={handleSearchChange}
-          style={{ padding: "10px", marginRight: "10px" }}
+          style={{
+            padding: "10px",
+            flexGrow: 1,
+            borderRadius: "5px",
+            border: "1px solid #ddd",
+          }}
         />
-        <select value={filterType} onChange={handleFilterChange} style={{ padding: "10px" }}>
+        <select
+          value={filterType}
+          onChange={handleFilterChange}
+          style={{
+            padding: "10px",
+            borderRadius: "5px",
+            border: "1px solid #ddd",
+          }}
+        >
           <option value="">All Types</option>
           <option value="Supervisory">Supervisory</option>
           <option value="Managerial">Managerial</option>
@@ -151,50 +182,57 @@ const Trainings = ({ trainings, deleteTraining }) => {
         </select>
       </div>
       {filteredTrainings.length > 0 ? (
-        <table border="1" style={{ width: "100%", textAlign: "left" }}>
+        <table style={tableStyle}>
           <thead>
             <tr>
-              <th onClick={() => handleSort("title")}>
+              <th style={thTdStyle} onClick={() => handleSort("title")}>
                 Title {getSortIcon("title")}
               </th>
-              <th onClick={() => handleSort("type")}>
-                Type {getSortIcon("type")}
+              <th style={thTdStyle} onClick={() => handleSort("type")}
+                >Type {getSortIcon("type")}
               </th>
-              <th onClick={() => handleSort("startDate")}>
+              <th style={thTdStyle} onClick={() => handleSort("startDate")}>
                 Start Date {getSortIcon("startDate")}
               </th>
-              <th onClick={() => handleSort("endDate")}>
+              <th style={thTdStyle} onClick={() => handleSort("endDate")}>
                 End Date {getSortIcon("endDate")}
               </th>
-              <th onClick={() => handleSort("hours")}>
+              <th style={thTdStyle} onClick={() => handleSort("hours")}>
                 Hours {getSortIcon("hours")}
               </th>
-              <th onClick={() => handleSort("sponsor")}>
+              <th style={thTdStyle} onClick={() => handleSort("sponsor")}>
                 Sponsor {getSortIcon("sponsor")}
               </th>
-              <th onClick={() => handleSort("author")}>
+              <th style={thTdStyle} onClick={() => handleSort("author")}>
                 Author {getSortIcon("author")}
               </th>
-              <th>
-                Certificate
-              </th>
-              <th>Actions</th>
+              <th style={thTdStyle}>Certificate</th>
+              <th style={thTdStyle}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredTrainings.map((training, index) => (
-              <tr key={index}>
-                <td>{training.title}</td>
-                <td>{training.type}</td>
-                <td>{training.startDate}</td>
-                <td>{training.endDate}</td>
-                <td>{training.hours}</td>
-                <td>{training.sponsor}</td>
-                <td>
+              <tr
+                key={index}
+                style={rowHoverStyle}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#f9f9f9")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "transparent")
+                }
+              >
+                <td style={thTdStyle}>{training.title}</td>
+                <td style={thTdStyle}>{training.type}</td>
+                <td style={thTdStyle}>{training.startDate}</td>
+                <td style={thTdStyle}>{training.endDate}</td>
+                <td style={thTdStyle}>{training.hours}</td>
+                <td style={thTdStyle}>{training.sponsor}</td>
+                <td style={thTdStyle}>
                   {training.author}
                   {training.office ? ` (${training.office})` : ""}
                 </td>
-                <td>
+                <td style={thTdStyle}>
                   {training.certificate ? (
                     <img
                       src={training.certificate}
@@ -207,11 +245,12 @@ const Trainings = ({ trainings, deleteTraining }) => {
                     "No image"
                   )}
                 </td>
-                <td>
+                <td style={thTdStyle}>
                   <button
                     onClick={() =>
-                      window.confirm("Are you sure you want to delete this training?") &&
-                      deleteTraining(index)
+                      window.confirm(
+                        "Are you sure you want to delete this training?"
+                      ) && deleteTraining(index)
                     }
                     style={{
                       padding: "5px 10px",
@@ -232,7 +271,6 @@ const Trainings = ({ trainings, deleteTraining }) => {
       ) : (
         <p>No trainings available.</p>
       )}
-
       {selectedCertificate && (
         <div
           style={{
