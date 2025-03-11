@@ -160,32 +160,42 @@ app.post('/login', async (req, res) => {
 
 // Edit User Route
 app.put('/api/users/:id', async (req, res) => {
-  const { email, newPassword } = req.body;
   const { id } = req.params;
+  const { password, ...updateData } = req.body; // Extract password and other fields
 
-  if (!email || !newPassword) {
-    return res.status(400).json({ message: 'Email and new password are required' });
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid user ID.' });
+  }
+
+  if (Object.keys(updateData).length === 0 && !password) {
+    return res.status(400).json({ message: 'No update fields provided.' });
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    // If password is provided, hash it before updating
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateData.password = hashedPassword; // Add hashed password to update fields
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       id,
-      { email, password: hashedPassword },
-      { new: true }
+      { $set: updateData },
+      { new: true, runValidators: true }
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'User not found.' });
     }
 
-    const newToken = jwt.sign({ id: updatedUser._id }, SECRET_KEY, { expiresIn: '1h' });
-    res.json({ message: 'User updated successfully.', token: newToken });
+    res.json({ message: 'User updated successfully.', user: updatedUser });
   } catch (error) {
     console.error('Error updating user:', error.message);
     res.status(500).json({ message: 'Error updating user.' });
   }
 });
+
+
 
 // Delete User Route
 app.delete('/api/users/:id', async (req, res) => {

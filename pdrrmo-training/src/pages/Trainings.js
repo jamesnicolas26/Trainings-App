@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
+import { ChevronUp, ChevronDown, Filter } from "lucide-react";
 
 const Trainings = ({ trainings, deleteTraining }) => {
+  const [filterType, setFilterType] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
   const imgStyle = {
     width: "100px",
     height: "100px",
@@ -16,7 +21,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
   };
 
   const exportToExcel = () => {
-    const data = trainings.map((training) => ({
+    const data = filteredTrainings.map((training) => ({
       Title: training.title,
       Type: training.type,
       "Start Date": training.startDate,
@@ -46,6 +51,45 @@ const Trainings = ({ trainings, deleteTraining }) => {
     XLSX.writeFile(workbook, `trainings_${timestamp}.xlsx`);
   };
 
+  const handleFilterChange = (e) => {
+    setFilterType(e.target.value);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedTrainings = [...trainings].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+    const valueA = a[sortConfig.key];
+    const valueB = b[sortConfig.key];
+    if (valueA < valueB) return sortConfig.direction === "asc" ? -1 : 1;
+    if (valueA > valueB) return sortConfig.direction === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  const filteredTrainings = sortedTrainings.filter((training) => {
+    const matchesFilter =
+      filterType === "" || training.type.toLowerCase() === filterType.toLowerCase();
+    const matchesSearch =
+      searchQuery === "" ||
+      training.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
+  };
+
   return (
     <div>
       <div
@@ -57,7 +101,6 @@ const Trainings = ({ trainings, deleteTraining }) => {
           marginTop: "40px",
         }}
       >
-      <br /><br />
         <h1 style={{ alignContent: "center" }}>Trainings</h1>
         <div>
           <button
@@ -90,23 +133,54 @@ const Trainings = ({ trainings, deleteTraining }) => {
           </Link>
         </div>
       </div>
-      {trainings.length > 0 ? (
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Search by title..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          style={{ padding: "10px", marginRight: "10px" }}
+        />
+        <select value={filterType} onChange={handleFilterChange} style={{ padding: "10px" }}>
+          <option value="">All Types</option>
+          <option value="Supervisory">Supervisory</option>
+          <option value="Managerial">Managerial</option>
+          <option value="Technical">Technical</option>
+        </select>
+      </div>
+      {filteredTrainings.length > 0 ? (
         <table border="1" style={{ width: "100%", textAlign: "left" }}>
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Type</th>
-              <th>Start Date</th>
-              <th>End Date</th>
-              <th>Hours</th>
-              <th>Sponsor</th>
-              <th>Author</th>
-              <th>Certificate</th>
+              <th onClick={() => handleSort("title")}>
+                Title {getSortIcon("title")}
+              </th>
+              <th onClick={() => handleSort("type")}>
+                Type {getSortIcon("type")}
+              </th>
+              <th onClick={() => handleSort("startDate")}>
+                Start Date {getSortIcon("startDate")}
+              </th>
+              <th onClick={() => handleSort("endDate")}>
+                End Date {getSortIcon("endDate")}
+              </th>
+              <th onClick={() => handleSort("hours")}>
+                Hours {getSortIcon("hours")}
+              </th>
+              <th onClick={() => handleSort("sponsor")}>
+                Sponsor {getSortIcon("sponsor")}
+              </th>
+              <th onClick={() => handleSort("author")}>
+                Author {getSortIcon("author")}
+              </th>
+              <th>
+                Certificate
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {trainings.map((training, index) => (
+            {filteredTrainings.map((training, index) => (
               <tr key={index}>
                 <td>{training.title}</td>
                 <td>{training.type}</td>

@@ -15,27 +15,38 @@ const AddTraining = ({ addTraining }) => {
   });
 
   const navigate = useNavigate();
-
-  const [users, setUsers] = useState([]);
+  const [authors, setAuthors] = useState([]); // Store fetched authors
   const fileInputRef = useRef(null);
 
-  // Fetch users from local storage on component mount
+  // Fetch authors from the backend
   useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-    setUsers(storedUsers);
+    const fetchAuthors = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/users");
+        if (!response.ok) {
+          throw new Error("Failed to fetch authors");
+        }
+        const data = await response.json();
+        setAuthors(data); // Store the authors in state
+      } catch (error) {
+        console.error("Error fetching authors:", error.message);
+      }
+    };
+
+    fetchAuthors();
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     if (name === "author") {
-      const selectedUser = users.find(
-        (user) => `${user.firstname} ${user.lastname}` === value
+      const selectedAuthor = authors.find(
+        (author) => `${author.firstname} ${author.lastname}` === value
       );
       setFormData((prev) => ({
         ...prev,
         author: value,
-        office: selectedUser ? selectedUser.office : "",
+        office: selectedAuthor ? selectedAuthor.office : "",
       }));
     } else {
       setFormData((prev) => ({
@@ -52,7 +63,7 @@ const AddTraining = ({ addTraining }) => {
       reader.onload = () => {
         setFormData((prev) => ({
           ...prev,
-          certificate: reader.result, // Base64 string
+          certificate: reader.result,
         }));
       };
       reader.readAsDataURL(file);
@@ -75,7 +86,7 @@ const AddTraining = ({ addTraining }) => {
     });
     if (fileInputRef.current) fileInputRef.current.value = "";
     alert("Training added successfully!");
-    navigate("/trainings")
+    navigate("/trainings");
   };
 
   return (
@@ -94,9 +105,14 @@ const AddTraining = ({ addTraining }) => {
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "15px" }}
       >
+        {/* Title */}
         <div>
           <label
-            style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
           >
             Title:
           </label>
@@ -112,6 +128,9 @@ const AddTraining = ({ addTraining }) => {
               borderRadius: "5px",
             }}
           >
+            <option value="" disabled>
+              Select Training Title
+            </option>
             <option disabled>BASIC COURSES:</option>
             <option value="DRRM Course">DRRM Course</option>
             <option value="Community-Based DRRM Training">
@@ -201,11 +220,17 @@ const AddTraining = ({ addTraining }) => {
             </option>
           </select>
         </div>
+
+        {/* Type */}
         <div>
           <label
-            style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
           >
-            Type:
+          Type:
           </label>
           <select
             required
@@ -227,80 +252,15 @@ const AddTraining = ({ addTraining }) => {
             <option value="Technical">Technical</option>
           </select>
         </div>
+
+        {/* Start Date */}
         <div>
           <label
-            style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
-          >
-            Author:
-          </label>
-          <select
-            required
-            name="author"
-            value={formData.author}
-            onChange={handleChange}
             style={{
-              width: "100%",
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
             }}
-          >
-            <option value="" disabled>
-              Select an author
-            </option>
-            {users.map((user, index) => (
-              <option
-                key={index}
-                value={`${user.firstname} ${user.lastname}`}
-              >
-                {user.firstname} {user.lastname}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label
-            style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
-          >
-            Office:
-          </label>
-          <input
-            type="text"
-            name="office"
-            value={formData.office}
-            readOnly
-            style={{
-              width: "100%",
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-              backgroundColor: "#f9f9f9",
-            }}
-          />
-        </div>
-        <div>
-          <label
-            style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
-          >
-            Sponsor:
-          </label>
-          <input
-            type="text"
-            name="sponsor"
-            value={formData.sponsor}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-            }}
-          />
-        </div>
-        <div>
-          <label
-            style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
           >
             Start Date:
           </label>
@@ -318,9 +278,15 @@ const AddTraining = ({ addTraining }) => {
             }}
           />
         </div>
+
+        {/* End Date */}
         <div>
           <label
-            style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
           >
             End Date:
           </label>
@@ -338,9 +304,15 @@ const AddTraining = ({ addTraining }) => {
             }}
           />
         </div>
+
+        {/* Hours */}
         <div>
           <label
-            style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
           >
             Hours:
           </label>
@@ -350,8 +322,6 @@ const AddTraining = ({ addTraining }) => {
             value={formData.hours}
             onChange={handleChange}
             required
-            min="1"
-            step="1"
             style={{
               width: "100%",
               padding: "10px",
@@ -360,57 +330,149 @@ const AddTraining = ({ addTraining }) => {
             }}
           />
         </div>
+
+        {/* Sponsor */}
         <div>
           <label
-            style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
-          >
-            Upload Certificate (optional):
-          </label>
-          <input
-            type="file"
-            accept="image/*, application/pdf"
-            onChange={handleFileChange}
-            ref={fileInputRef}
             style={{
               display: "block",
-              marginTop: "5px",
-              padding: "5px",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
+          >
+            Sponsor:
+          </label>
+          <input
+            type="text"
+            name="sponsor"
+            value={formData.sponsor}
+            onChange={handleChange}
+            required
+            style={{
+              width: "100%",
+              padding: "10px",
               border: "1px solid #ccc",
               borderRadius: "5px",
             }}
           />
         </div>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-        <button
-          type="submit"
-          style={{
-            backgroundColor: "#007BFF",
-            color: "#fff",
-            padding: "10px",
-            border: "none",
-            borderRadius: "5px",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          Add Training
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate("/trainings")}
-          style={{
-            backgroundColor: "#e74c3c",
-            color: "#fff",
-            padding: "0.8rem 1.5rem",
-            borderRadius: "5px",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1rem",
-          }}
-        >
-          Cancel
-        </button>
-      </div>
+
+        {/* Author */}
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
+          >
+            Author:
+          </label>
+          <select
+            required
+            name="author"
+            value={formData.author}
+            onChange={handleChange}
+            style={{
+              width: "100%",
+              padding: "10px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+            }}
+          >
+            <option value="" disabled>
+              Select Author
+            </option>
+            {authors.map((author) => (
+              <option
+                key={author._id}
+                value={`${author.firstname} ${author.lastname}`}
+              >
+                {author.firstname} {author.lastname}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Office */}
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
+          >
+            Office:
+          </label>
+          <input
+            type="text"
+            name="office"
+            value={formData.office}
+            readOnly
+            style={{
+              width: "100%",
+              padding: "10px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+              backgroundColor: "#f9f9f9",
+            }}
+          />
+        </div>
+
+        {/* Certificate */}
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
+          >
+            Certificate:
+          </label>
+          <input
+            type="file"
+            accept=".jpg,.jpeg,.png,.pdf"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            style={{
+              display: "block",
+            }}
+          />
+        </div>
+
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <button
+            type="submit"
+            style={{
+              backgroundColor: "#007BFF",
+              color: "#fff",
+              padding: "10px 20px",
+              border: "none",
+              borderRadius: "5px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Add Training
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/trainings")}
+            style={{
+              backgroundColor: "#e74c3c",
+              color: "#fff",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );
