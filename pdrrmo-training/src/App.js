@@ -10,6 +10,7 @@ import EditUser from "./components/EditUser";
 import Logout from "./components/Logout";
 import PrivateRoute from "./Auth/PrivateRoute";
 import { AuthProvider } from "./Auth/AuthContext";
+import RoleProtectedRoute from "./Auth/RoleProtectedRoute";
 
 export default function App() {
   const [users, setUsers] = useState(() => {
@@ -105,9 +106,9 @@ export default function App() {
         <Route
           path="/users"
           element={
-            <PrivateRoute requiredRole="Admin">
+            <RoleProtectedRoute requiredRole="Admin">
               <Users users={users} deleteUser={deleteUser} />
-            </PrivateRoute>
+            </RoleProtectedRoute>
           }
         />
         <Route

@@ -1,26 +1,52 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-const Users = ({ currentUser }) => {
+const Users = ({ currentUser = null }) => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
 
-  // Redirect non-admin users
+  // Ensure `currentUser` is handled safely
   useEffect(() => {
-    if (currentUser?.role !== "Admin") {
+    if (!currentUser || currentUser.role !== "Admin") {
       alert("Access denied. Only admins can access this page.");
-      navigate("/home");
+      window.location.href = "/home";
     }
-  }, [currentUser, navigate]);
+  }, [currentUser]);
 
+  // Fetch users from API
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true);
       try {
-        const response = await fetch("http://localhost:5000/api/users");
+        const token = localStorage.getItem("token");
+        if (!token) {
+          alert("Authentication error. Please log in again.");
+          window.location.href = "/";
+          return;
+        }
+
+        const response = await fetch("http://localhost:5000/api/users", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            alert("Unauthorized access. Please log in again.");
+            localStorage.removeItem("token");
+            window.location.href = "/";
+            return;
+          }
           throw new Error(`Error ${response.status}: Unable to fetch users.`);
         }
+
         const data = await response.json();
 
         const formattedUsers = data.map((user) => ({
@@ -31,33 +57,41 @@ const Users = ({ currentUser }) => {
           middlename: user.middlename || "",
           office: user.office || "",
           username: user.username || "",
-          email: user.email || "",
           isApproved: user.isApproved || false,
+          role: user.role || "User",
         }));
 
         setUsers(formattedUsers);
+        setFilteredUsers(formattedUsers);
       } catch (err) {
         console.error(err);
         setError("Failed to load users. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUsers();
   }, []);
 
+  // Approve user
   const approveUser = async (id) => {
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:5000/api/users/approve/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
         throw new Error(`Error ${response.status}: Unable to approve user.`);
       }
 
-      setUsers(
-        users.map((user) =>
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
           user._id === id ? { ...user, isApproved: true } : user
         )
       );
@@ -68,19 +102,28 @@ const Users = ({ currentUser }) => {
     }
   };
 
+  // Delete user
   const deleteUser = async (id) => {
     try {
+      const token = localStorage.getItem("token");
       const confirmDelete = window.confirm("Are you sure you want to delete this user?");
       if (!confirmDelete) return;
 
       const response = await fetch(`http://localhost:5000/api/users/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       if (!response.ok) {
         throw new Error(`Error ${response.status}: Unable to delete user.`);
       }
 
-      setUsers(users.filter((user) => user._id !== id));
+      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== id));
+      setFilteredUsers((prevFiltered) =>
+        prevFiltered.filter((user) => user._id !== id)
+      );
       alert("User deleted successfully.");
     } catch (err) {
       console.error(err);
@@ -88,96 +131,81 @@ const Users = ({ currentUser }) => {
     }
   };
 
+  // Handle search
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+    const query = e.target.value.toLowerCase();
+    setFilteredUsers(
+      users.filter(
+        (user) =>
+          user.firstname.toLowerCase().includes(query) ||
+          user.lastname.toLowerCase().includes(query)
+      )
+    );
+  };
+
+  // Pagination logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  if (!currentUser || currentUser.role !== "Admin") {
+    return <p>Redirecting...</p>;
+  }
+
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", color: "#333" }}>
-      <br />
-      <br />
-      <h1 style={{ textAlign: "center", color: "#444" }}>Registered Users</h1>
-      {error && <p style={{ color: "#d9534f", textAlign: "center" }}>{error}</p>}
-      {users.length > 0 ? (
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: "20px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <thead>
-            <tr style={{ backgroundColor: "#f4f4f4", textAlign: "left" }}>
-              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Title</th>
-              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Lastname</th>
-              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Firstname</th>
-              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Middlename</th>
-              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Office</th>
-              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Username</th>
-              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Email</th>
-              <th style={{ padding: "10px", borderBottom: "2px solid #ddd" }}>Actions</th>
+    <div style={{ padding: "20px" }}>
+      <h1>Users</h1>
+      {loading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+      <input
+        type="text"
+        placeholder="Search by name"
+        value={searchQuery}
+        onChange={handleSearch}
+      />
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Lastname</th>
+            <th>Firstname</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentUsers.map((user) => (
+            <tr key={user._id}>
+              <td>{user.title}</td>
+              <td>{user.lastname}</td>
+              <td>{user.firstname}</td>
+              <td>{user.role}</td>
+              <td>
+                {!user.isApproved && (
+                  <button onClick={() => approveUser(user._id)}>Approve</button>
+                )}
+                <button onClick={() => deleteUser(user._id)}>Delete</button>
+                <Link to={`/edituser/${user._id}`}>
+                  <button>Edit</button>
+                </Link>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id} style={{ borderBottom: "1px solid #ddd" }}>
-                <td style={{ padding: "10px" }}>{user.title}</td>
-                <td style={{ padding: "10px" }}>{user.lastname}</td>
-                <td style={{ padding: "10px" }}>{user.firstname}</td>
-                <td style={{ padding: "10px" }}>{user.middlename}</td>
-                <td style={{ padding: "10px" }}>{user.office}</td>
-                <td style={{ padding: "10px" }}>{user.username}</td>
-                <td style={{ padding: "10px" }}>{user.email}</td>
-                <td style={{ padding: "10px" }}>
-                  {!user.isApproved && (
-                    <button
-                      onClick={() => approveUser(user._id)}
-                      style={{
-                        padding: "5px 10px",
-                        marginRight: "5px",
-                        backgroundColor: "#5cb85c",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "3px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Approve
-                    </button>
-                  )}
-                  <button
-                    onClick={() => deleteUser(user._id)}
-                    style={{
-                      padding: "5px 10px",
-                      marginRight: "5px",
-                      backgroundColor: "#d9534f",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "3px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Delete
-                  </button>
-                  <Link to={`/edituser/${user._id}`}>
-                    <button
-                      style={{
-                        padding: "5px 10px",
-                        backgroundColor: "#5bc0de",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "3px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Edit
-                    </button>
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p style={{ textAlign: "center", marginTop: "20px" }}>No registered users yet.</p>
-      )}
+          ))}
+        </tbody>
+      </table>
+      <div>
+        {Array.from(
+          { length: Math.ceil(filteredUsers.length / usersPerPage) },
+          (_, index) => (
+            <button key={index + 1} onClick={() => paginate(index + 1)}>
+              {index + 1}
+            </button>
+          )
+        )}
+      </div>
     </div>
   );
 };
