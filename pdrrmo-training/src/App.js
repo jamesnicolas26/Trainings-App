@@ -9,7 +9,7 @@ import AddTraining from "./components/AddTraining";
 import EditUser from "./components/EditUser";
 import Logout from "./components/Logout";
 import PrivateRoute from "./Auth/PrivateRoute";
-import { AuthProvider } from "./Auth/AuthContext"; // Ensure AuthProvider is wrapping the app
+import { AuthProvider } from "./Auth/AuthContext";
 
 export default function App() {
   const [users, setUsers] = useState(() => {
@@ -69,7 +69,9 @@ export default function App() {
   };
 
   const deleteTraining = (index) => {
-    setTrainings((prevTrainings) => prevTrainings.filter((_, i) => i !== index));
+    setTrainings((prevTrainings) =>
+      prevTrainings.filter((_, i) => i !== index)
+    );
   };
 
   return (
@@ -95,7 +97,7 @@ export default function App() {
         <Route
           path="/addtraining"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="Admin">
               <AddTraining addTraining={addTraining} />
             </PrivateRoute>
           }
@@ -103,7 +105,7 @@ export default function App() {
         <Route
           path="/users"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="Admin">
               <Users users={users} deleteUser={deleteUser} />
             </PrivateRoute>
           }

@@ -1,11 +1,22 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
-const PrivateRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth(); // Access authentication state from context
+const PrivateRoute = ({ children, requiredRole }) => {
+  const { isAuthenticated, user } = useAuth(); // Access authentication state and user info
+  const location = useLocation();
 
-  return isAuthenticated ? children : <Navigate to="/" />;
+  // Check if the user is authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  // If a required role is specified, ensure the user's role matches
+  if (requiredRole && user?.role !== requiredRole) {
+    return <Navigate to="/home" state={{ from: location }} replace />;
+  }
+
+  return children;
 };
 
 export default PrivateRoute;

@@ -4,7 +4,7 @@ import { useAuth } from "../Auth/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -21,15 +21,14 @@ const Login = () => {
     setError("");
     setIsLoading(true);
   
-    // Input validation
-    if (!formData.email || !formData.password) {
-      setError("All fields are required.");
+    if (!formData.username || !formData.password) {
+      setError("Username and password are required.");
       setIsLoading(false);
       return;
     }
   
     try {
-      const response = await fetch("http://localhost:5000/login", { // Corrected route
+      const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,20 +37,26 @@ const Login = () => {
       });
   
       const data = await response.json();
+      console.log("Response:", response);
+      console.log("Data:", data);
   
       if (response.ok) {
-        login(data); // Update authentication context with user data
-        navigate("/home");
+        if (data.role === "Admin" || data.isApproved) {
+          login(data); // Update AuthContext
+          navigate("/home");
+        } else {
+          setError("Your account is not approved by an admin yet.");
+        }
       } else {
         setError(data.message || "Invalid credentials. Please try again.");
       }
     } catch (err) {
       setError("An error occurred. Please try again later.");
+      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
-  };
-  
+  };  
 
   const inputStyle = {
     width: "100%",
@@ -89,20 +94,20 @@ const Login = () => {
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "1rem" }}>
             <label
-              htmlFor="email"
+              htmlFor="username"
               style={{ display: "block", marginBottom: "0.5rem" }}
             >
-              Email
+              Username
             </label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Username"
+              value={formData.username}
               onChange={handleChange}
               style={inputStyle}
-              aria-label="Email"
+              aria-label="Username"
             />
           </div>
           <div style={{ marginBottom: "1.5rem" }}>

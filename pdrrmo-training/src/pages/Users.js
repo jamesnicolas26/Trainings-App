@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const Users = () => {
+const Users = ({ currentUser }) => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  // Redirect non-admin users
+  useEffect(() => {
+    if (currentUser?.role !== "Admin") {
+      alert("Access denied. Only admins can access this page.");
+      navigate("/home");
+    }
+  }, [currentUser, navigate]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -23,6 +32,7 @@ const Users = () => {
           office: user.office || "",
           username: user.username || "",
           email: user.email || "",
+          isApproved: user.isApproved || false,
         }));
 
         setUsers(formattedUsers);
@@ -34,6 +44,29 @@ const Users = () => {
 
     fetchUsers();
   }, []);
+
+  const approveUser = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/users/approve/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: Unable to approve user.`);
+      }
+
+      setUsers(
+        users.map((user) =>
+          user._id === id ? { ...user, isApproved: true } : user
+        )
+      );
+      alert("User approved successfully.");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to approve user. Please try again later.");
+    }
+  };
 
   const deleteUser = async (id) => {
     try {
@@ -57,8 +90,8 @@ const Users = () => {
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", color: "#333" }}>
-    <br />
-    <br />
+      <br />
+      <br />
       <h1 style={{ textAlign: "center", color: "#444" }}>Registered Users</h1>
       {error && <p style={{ color: "#d9534f", textAlign: "center" }}>{error}</p>}
       {users.length > 0 ? (
@@ -93,6 +126,22 @@ const Users = () => {
                 <td style={{ padding: "10px" }}>{user.username}</td>
                 <td style={{ padding: "10px" }}>{user.email}</td>
                 <td style={{ padding: "10px" }}>
+                  {!user.isApproved && (
+                    <button
+                      onClick={() => approveUser(user._id)}
+                      style={{
+                        padding: "5px 10px",
+                        marginRight: "5px",
+                        backgroundColor: "#5cb85c",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "3px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Approve
+                    </button>
+                  )}
                   <button
                     onClick={() => deleteUser(user._id)}
                     style={{

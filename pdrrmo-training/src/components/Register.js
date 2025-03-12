@@ -11,7 +11,7 @@ const Register = () => {
     middlename: "",
     office: "",
     username: "",
-    email: "",
+    role: "",
     password: "",
     confirmPassword: "",
   });
@@ -62,7 +62,7 @@ const Register = () => {
         "Save the Children Philippines Luzon Program",
       ];
       setOffices(officeList); // Populate the dropdown menu
-    };    
+    };
 
     fetchOffices();
   }, []);
@@ -73,61 +73,47 @@ const Register = () => {
 
   const validateForm = () => {
     const {
-      title,
-      lastname,
-      firstname,
-      office,
-      username,
-      email,
-      password,
-      confirmPassword,
+        title,
+        lastname,
+        firstname,
+        office,
+        username,
+        role,
+        password,
+        confirmPassword,
     } = formData;
 
     if (
-      !title ||
-      !lastname ||
-      !firstname ||
-      !office ||
-      !username ||
-      !email ||
-      !password ||
-      !confirmPassword
+        !title ||
+        !lastname ||
+        !firstname ||
+        !office ||
+        !username ||
+        !role ||
+        !password ||
+        !confirmPassword
     ) {
-      alert("All fields are required.");
-      return false;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      alert("Invalid email format!");
-      return false;
+        alert("All fields are required.");
+        return false;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return false;
+        alert("Passwords do not match!");
+        return false;
     }
 
     return true;
-  };
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+
+    if (!validateForm()) {
       setIsLoading(false);
       return;
     }
-  
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      alert("Invalid email format!");
-      setIsLoading(false);
-      return;
-    }
-  
-    console.log("Form data being sent to backend:", formData); // Debugging log
-  
+
     try {
       const response = await fetch("http://localhost:5000/register", {
         method: "POST",
@@ -136,9 +122,9 @@ const Register = () => {
         },
         body: JSON.stringify(formData),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         alert("User registered successfully!");
         setFormData({
@@ -148,7 +134,7 @@ const Register = () => {
           middlename: "",
           office: "",
           username: "",
-          email: "",
+          role: "",
           password: "",
           confirmPassword: "",
         });
@@ -205,7 +191,11 @@ const Register = () => {
 
   return (
     <div style={containerStyle}>
-      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Register User</h1>
+      <br />
+      <br />
+      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>
+        Register User
+      </h1>
       <form onSubmit={handleSubmit}>
         <div style={gridStyle}>
           {/* Title */}
@@ -292,7 +282,7 @@ const Register = () => {
           </div>
         </div>
 
-        {/* Username, Email, Password */}
+        {/* Username, Role, Password */}
         <div style={gridStyle}>
           <div>
             <label style={labelStyle}>Username</label>
@@ -308,16 +298,18 @@ const Register = () => {
           </div>
 
           <div>
-            <label style={labelStyle}>Email</label>
-            <input
+            <label style={labelStyle}>Role</label>
+            <select
               required
-              type="email"
-              name="email"
-              value={formData.email}
+              name="role"
+              value={formData.role}
               onChange={handleChange}
               style={inputStyle}
-              placeholder="Enter your email"
-            />
+            >
+              <option value="">Select Role</option>
+              <option value="Admin">Admin</option>
+              <option value="Member">Member</option>
+            </select>
           </div>
 
           <div>
