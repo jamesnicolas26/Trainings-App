@@ -11,8 +11,26 @@ function Home() {
         minHeight: "100vh",
       }}
     >
-      <br />
-      <br />
+    <br />
+    <br />
+    <br />
+      {/* Logo Section */}
+      <div
+        style={{
+          marginBottom: "20px",
+        }}
+      >
+        <img
+          src="/pdrrmo logo.png" // Replace with the actual logo path
+          alt="PDRRMO Logo"
+          style={{
+            width: "120px",
+            height: "120px",
+            objectFit: "contain",
+          }}
+        />
+      </div>
+
       <h1
         style={{
           fontSize: "2.5rem",
