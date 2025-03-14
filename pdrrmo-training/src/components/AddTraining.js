@@ -22,19 +22,32 @@ const AddTraining = ({ addTraining }) => {
   useEffect(() => {
     const fetchAuthors = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/users");
+        // Retrieve token from localStorage (or other storage if used)
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Authentication token not found");
+  
+        // Send a request with the Authorization header
+        const response = await fetch("http://localhost:5000/api/users", {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token
+            "Content-Type": "application/json",
+          },
+        });
+  
         if (!response.ok) {
           throw new Error("Failed to fetch authors");
         }
+  
         const data = await response.json();
-        setAuthors(data); // Store the authors in state
+        setAuthors(data); // Update authors state with fetched data
       } catch (error) {
         console.error("Error fetching authors:", error.message);
       }
     };
-
+  
     fetchAuthors();
   }, []);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;

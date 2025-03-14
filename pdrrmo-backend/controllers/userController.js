@@ -1,14 +1,14 @@
-const User = require("../models/User"); // Ensure "User" matches the filename exactly
+const User = require("../models/User"); // Ensure the correct model is imported
 
 const getAllUsers = async (req, res) => {
   try {
+    // Fetch all users except passwords
     const users = await User.find({}, "-password");
     res.json(users);
   } catch (error) {
+    console.error("Error fetching users:", error.message);
     res.status(500).json({ message: "Error fetching users." });
   }
 };
-
-// Other CRUD methods like updateUser, deleteUser, etc., can go here
 
 module.exports = { getAllUsers };

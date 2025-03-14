@@ -9,10 +9,11 @@ import AddTraining from "./components/AddTraining";
 import EditUser from "./components/EditUser";
 import Logout from "./components/Logout";
 import PrivateRoute from "./Auth/PrivateRoute";
-import { AuthProvider } from "./Auth/AuthContext";
+import { AuthProvider, useAuth } from "./Auth/AuthContext";
 import RoleProtectedRoute from "./Auth/RoleProtectedRoute";
 
 export default function App() {
+  const { clearAndRegenerateToken } = useAuth();
   const [users, setUsers] = useState(() => {
     try {
       const savedUsers = localStorage.getItem("users");
@@ -32,6 +33,18 @@ export default function App() {
       return [];
     }
   });
+
+  // Automatically refresh the token on app load
+  useEffect(() => {
+    const refreshToken = async () => {
+      try {
+        await clearAndRegenerateToken();
+      } catch (error) {
+        console.error("Error refreshing token:", error);
+      }
+    };
+    refreshToken();
+  }, [clearAndRegenerateToken]);
 
   useEffect(() => {
     try {
@@ -127,10 +140,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/register"
-          element={<Register addUser={addUser} />} // Public route
-        />
+        <Route path="/register" element={<Register addUser={addUser} />} />
         <Route path="*" element={<div>404 - Page Not Found</div>} />
       </Routes>
     </AuthProvider>

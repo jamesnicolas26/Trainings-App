@@ -2,6 +2,13 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
+// Helper function to generate a token
+const generateToken = (userId, role) => {
+  const secretKey = process.env.SECRET_KEY || "your-secret-key";
+  const token = jwt.sign({ id: userId, role }, secretKey, { expiresIn: "1h" });
+  return token;
+};
+
 // Login Logic
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
@@ -17,9 +24,9 @@ const loginUser = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) return res.status(401).json({ message: "Invalid credentials." });
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.SECRET_KEY, { expiresIn: "1h" });
+    // Generate a new token
+    const token = generateToken(user._id, user.role);
 
-    // Return the token, approval status, and role for client use
     res.json({ token, isApproved: user.isApproved, role: user.role });
   } catch (error) {
     console.error("Error logging in:", error);
@@ -40,9 +47,7 @@ const registerUser = async (req, res) => {
     if (existingUser) return res.status(409).json({ message: "Username already exists." });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Automatically approve admin users
-    const isApproved = role === "Admin";
+    const isApproved = role === "Admin"; // Automatically approve admin users
 
     const newUser = new User({
       title,
@@ -65,4 +70,23 @@ const registerUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser, registerUser };
+// Refresh Token Logic
+const refreshToken = (req, res) => {
+  const oldToken = req.headers.authorization?.split(" ")[1];
+
+  if (!oldToken) {
+    return res.status(400).json({ message: "Token required." });
+  }
+
+  try {
+    const decoded = jwt.verify(oldToken, process.env.SECRET_KEY || "your-secret-key");
+    const newToken = generateToken(decoded.id, decoded.role);
+
+    res.json({ token: newToken });
+  } catch (error) {
+    console.error("Error refreshing token:", error.message);
+    res.status(403).json({ message: "Invalid or expired token." });
+  }
+};
+
+module.exports = { loginUser, registerUser, refreshToken };

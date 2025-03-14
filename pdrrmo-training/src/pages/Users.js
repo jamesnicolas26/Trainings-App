@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const Users = ({ currentUser = null }) => {
+const Users = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -10,45 +10,41 @@ const Users = ({ currentUser = null }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
 
-  // Ensure `currentUser` is handled safely
-  useEffect(() => {
-    if (!currentUser || currentUser.role !== "Admin") {
-      alert("Access denied. Only admins can access this page.");
-      window.location.href = "/home";
-    }
-  }, [currentUser]);
-
   // Fetch users from API
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
+  
         if (!token) {
+          console.log("Token is missing or null:", token); // Debugging
           alert("Authentication error. Please log in again.");
-          window.location.href = "/";
+          window.location.href = "/"; // Redirect to login page
           return;
         }
-
+  
         const response = await fetch("http://localhost:5000/api/users", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         if (!response.ok) {
+          console.log("API Response Status:", response.status); // Debugging
           if (response.status === 401 || response.status === 403) {
             alert("Unauthorized access. Please log in again.");
-            localStorage.removeItem("token");
-            window.location.href = "/";
+            localStorage.removeItem("token"); // Clear invalid token
+            window.location.href = "/"; // Redirect to login page
             return;
           }
           throw new Error(`Error ${response.status}: Unable to fetch users.`);
         }
-
+  
         const data = await response.json();
-
+        console.log("Fetched Users:", data); // Debugging API response
+  
         const formattedUsers = data.map((user) => ({
           _id: user._id,
           title: user.title || "",
@@ -60,19 +56,20 @@ const Users = ({ currentUser = null }) => {
           isApproved: user.isApproved || false,
           role: user.role || "User",
         }));
-
+  
         setUsers(formattedUsers);
         setFilteredUsers(formattedUsers);
       } catch (err) {
-        console.error(err);
+        console.error("Fetch Users Error:", err.message);
         setError("Failed to load users. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchUsers();
   }, []);
+  
 
   // Approve user
   const approveUser = async (id) => {
@@ -150,10 +147,6 @@ const Users = ({ currentUser = null }) => {
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  if (!currentUser || currentUser.role !== "Admin") {
-    return <p>Redirecting...</p>;
-  }
 
   return (
     <div style={{ padding: "20px" }}>
