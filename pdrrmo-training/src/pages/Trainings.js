@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { ChevronUp, ChevronDown, Filter } from "lucide-react";
 
 const Trainings = ({ trainings, deleteTraining }) => {
   const [filterType, setFilterType] = useState("");
+  const [filterOffice, setFilterOffice] = useState("");
+  const [filterAuthor, setFilterAuthor] = useState("");
+  const [filterYear, setFilterYear] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [selectedCertificate, setSelectedCertificate] = useState(null);
@@ -65,7 +68,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
   };
 
   const handleImageError = (e) => {
-    e.target.src = "path/to/default-image.jpg"; // Replace with a default image path
+    e.target.src = "path/to/default-image.jpg"; // Replace this with the actual path to the default image.
   };
 
   const exportToExcel = () => {
@@ -99,13 +102,11 @@ const Trainings = ({ trainings, deleteTraining }) => {
     XLSX.writeFile(workbook, `trainings_${timestamp}.xlsx`);
   };
 
-  const handleFilterChange = (e) => {
-    setFilterType(e.target.value);
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  const handleFilterChange = (e) => setFilterType(e.target.value);
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+  const handleOfficeChange = (e) => setFilterOffice(e.target.value);
+  const handleAuthorChange = (e) => setFilterAuthor(e.target.value);
+  const handleYearChange = (e) => setFilterYear(e.target.value);
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -114,6 +115,8 @@ const Trainings = ({ trainings, deleteTraining }) => {
     }
     setSortConfig({ key, direction });
   };
+
+  const clearSorting = () => setSortConfig({ key: null, direction: "asc" });
 
   const sortedTrainings = [...trainings].sort((a, b) => {
     if (!sortConfig.key) return 0;
@@ -126,10 +129,14 @@ const Trainings = ({ trainings, deleteTraining }) => {
 
   const filteredTrainings = sortedTrainings.filter((training) => {
     const matchesFilter =
-      filterType === "" || training.type.toLowerCase() === filterType.toLowerCase();
+      (filterType === "" || training.type.toLowerCase() === filterType.toLowerCase()) &&
+      (filterOffice === "" || (training.office && training.office.toLowerCase().includes(filterOffice.toLowerCase()))) &&
+      (filterAuthor === "" || training.author.toLowerCase().includes(filterAuthor.toLowerCase())) &&
+      (filterYear === "" || (training.startDate && training.startDate.includes(filterYear)));
+
     const matchesSearch =
-      searchQuery === "" ||
-      training.title.toLowerCase().includes(searchQuery.toLowerCase());
+      searchQuery === "" || training.title.toLowerCase().includes(searchQuery.toLowerCase());
+
     return matchesFilter && matchesSearch;
   });
 
@@ -137,6 +144,14 @@ const Trainings = ({ trainings, deleteTraining }) => {
     if (sortConfig.key !== key) return null;
     return sortConfig.direction === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setSelectedCertificate(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div style={containerStyle}>
@@ -153,33 +168,48 @@ const Trainings = ({ trainings, deleteTraining }) => {
           </Link>
         </div>
       </div>
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
+      <div style={{ marginBottom: "20px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
         <input
           type="text"
           placeholder="Search by title..."
           value={searchQuery}
           onChange={handleSearchChange}
-          style={{
-            padding: "10px",
-            flexGrow: 1,
-            borderRadius: "5px",
-            border: "1px solid #ddd",
-          }}
+          style={{ padding: "10px", flexGrow: 1, borderRadius: "5px", border: "1px solid #ddd" }}
         />
         <select
           value={filterType}
           onChange={handleFilterChange}
-          style={{
-            padding: "10px",
-            borderRadius: "5px",
-            border: "1px solid #ddd",
-          }}
+          style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ddd" }}
         >
           <option value="">All Types</option>
           <option value="Supervisory">Supervisory</option>
           <option value="Managerial">Managerial</option>
           <option value="Technical">Technical</option>
         </select>
+        <input
+          type="text"
+          placeholder="Filter by office..."
+          value={filterOffice}
+          onChange={handleOfficeChange}
+          style={{ padding: "10px", flexGrow: 1, borderRadius: "5px", border: "1px solid #ddd" }}
+        />
+        <input
+          type="text"
+          placeholder="Filter by author..."
+          value={filterAuthor}
+          onChange={handleAuthorChange}
+          style={{ padding: "10px", flexGrow: 1, borderRadius: "5px", border: "1px solid #ddd" }}
+        />
+        <input
+          type="text"
+          placeholder="Filter by year..."
+          value={filterYear}
+          onChange={handleYearChange}
+          style={{ padding: "10px", flexGrow: 1, borderRadius: "5px", border: "1px solid #ddd" }}
+        />
+        <button onClick={clearSorting} style={{ ...buttonStyle, backgroundColor: "#FFA500" }}>
+          Clear Sorting
+        </button>
       </div>
       {filteredTrainings.length > 0 ? (
         <table style={tableStyle}>
@@ -188,8 +218,8 @@ const Trainings = ({ trainings, deleteTraining }) => {
               <th style={thTdStyle} onClick={() => handleSort("title")}>
                 Title {getSortIcon("title")}
               </th>
-              <th style={thTdStyle} onClick={() => handleSort("type")}
-                >Type {getSortIcon("type")}
+              <th style={thTdStyle} onClick={() => handleSort("type")}>
+                Type {getSortIcon("type")}
               </th>
               <th style={thTdStyle} onClick={() => handleSort("startDate")}>
                 Start Date {getSortIcon("startDate")}
@@ -290,12 +320,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
           <img
             src={selectedCertificate}
             alt="Certificate"
-            style={{
-              maxWidth: "90%",
-              maxHeight: "90%",
-              borderRadius: "10px",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.5)",
-            }}
+            style={{ maxHeight: "90%", maxWidth: "90%" }}
           />
         </div>
       )}
