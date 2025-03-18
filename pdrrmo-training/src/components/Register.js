@@ -11,7 +11,7 @@ const Register = () => {
     middlename: "",
     office: "",
     username: "",
-    role: "",
+    role: "Member",
     password: "",
     confirmPassword: "",
   });
@@ -297,6 +297,8 @@ const Register = () => {
             />
           </div>
 
+          {/* Role */}
+          {/*
           <div>
             <label style={labelStyle}>Role</label>
             <select
@@ -311,6 +313,7 @@ const Register = () => {
               <option value="Member">Member</option>
             </select>
           </div>
+          */}
 
           <div>
             <label style={labelStyle}>Password</label>

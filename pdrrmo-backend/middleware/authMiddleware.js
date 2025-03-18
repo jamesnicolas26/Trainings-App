@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require("../models/user");
 
 // Middleware to authenticate and verify token
 const authenticate = (req, res, next) => {
@@ -17,7 +17,7 @@ const authenticate = (req, res, next) => {
     next();
   } catch (error) {
     console.error("JWT Error:", error.message);
-    res.status(403).json({ message: "Authentication failed." });
+    res.status(403).json({ message: "Authentication failed. Invalid or expired token." });
   }
 };
 
@@ -44,4 +44,24 @@ const authorizeAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticate, authorizeAdmin };
+// Middleware to protect routes for authenticated users
+const protect = async (req, res, next) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Unauthorized access. User not authenticated." });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    req.user = user; // Attach the full user object to the request
+    next();
+  } catch (error) {
+    console.error("Protection error:", error.message);
+    res.status(500).json({ message: "Error verifying user." });
+  }
+};
+
+module.exports = { authenticate, authorizeAdmin, protect };

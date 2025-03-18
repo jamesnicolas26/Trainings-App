@@ -6,7 +6,8 @@ const RoleProtectedRoute = ({ children, requiredRole }) => {
   const { user } = useAuth();
 
   if (!user || user.role !== requiredRole) {
-    return <Navigate to="/not-authorized" />;
+    alert("Access denied. You do not have the required permissions.");
+    return <Navigate to="/home" />;
   }
 
   return children;

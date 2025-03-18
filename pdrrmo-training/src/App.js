@@ -111,7 +111,7 @@ export default function App() {
         <Route
           path="/addtraining"
           element={
-            <PrivateRoute requiredRole="Admin">
+            <PrivateRoute>
               <AddTraining addTraining={addTraining} />
             </PrivateRoute>
           }
@@ -127,7 +127,7 @@ export default function App() {
         <Route
           path="/edituser/:id"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole={"Admin"}>
               <EditUser users={users} updateUser={updateUser} />
             </PrivateRoute>
           }

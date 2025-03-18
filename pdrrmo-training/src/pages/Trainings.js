@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
-import { ChevronUp, ChevronDown, Filter } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 const Trainings = ({ trainings, deleteTraining }) => {
   const [filterType, setFilterType] = useState("");
@@ -116,8 +116,6 @@ const Trainings = ({ trainings, deleteTraining }) => {
     setSortConfig({ key, direction });
   };
 
-  const clearSorting = () => setSortConfig({ key: null, direction: "asc" });
-
   const sortedTrainings = [...trainings].sort((a, b) => {
     if (!sortConfig.key) return 0;
     const valueA = a[sortConfig.key];
@@ -207,9 +205,6 @@ const Trainings = ({ trainings, deleteTraining }) => {
           onChange={handleYearChange}
           style={{ padding: "10px", flexGrow: 1, borderRadius: "5px", border: "1px solid #ddd" }}
         />
-        <button onClick={clearSorting} style={{ ...buttonStyle, backgroundColor: "#FFA500" }}>
-          Clear Sorting
-        </button>
       </div>
       {filteredTrainings.length > 0 ? (
         <table style={tableStyle}>

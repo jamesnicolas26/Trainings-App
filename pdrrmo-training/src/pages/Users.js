@@ -16,35 +16,32 @@ const Users = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-  
+
         if (!token) {
-          console.log("Token is missing or null:", token); // Debugging
           alert("Authentication error. Please log in again.");
-          window.location.href = "/"; // Redirect to login page
+          window.location.href = "/";
           return;
         }
-  
+
         const response = await fetch("http://localhost:5000/api/users", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         if (!response.ok) {
-          console.log("API Response Status:", response.status); // Debugging
           if (response.status === 401 || response.status === 403) {
             alert("Unauthorized access. Please log in again.");
-            localStorage.removeItem("token"); // Clear invalid token
-            window.location.href = "/"; // Redirect to login page
+            localStorage.removeItem("token");
+            window.location.href = "/";
             return;
           }
           throw new Error(`Error ${response.status}: Unable to fetch users.`);
         }
-  
+
         const data = await response.json();
-        console.log("Fetched Users:", data); // Debugging API response
-  
+
         const formattedUsers = data.map((user) => ({
           _id: user._id,
           title: user.title || "",
@@ -56,32 +53,35 @@ const Users = () => {
           isApproved: user.isApproved || false,
           role: user.role || "User",
         }));
-  
+
         setUsers(formattedUsers);
         setFilteredUsers(formattedUsers);
       } catch (err) {
-        console.error("Fetch Users Error:", err.message);
+        console.error(err.message);
         setError("Failed to load users. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchUsers();
   }, []);
-  
 
   // Approve user
   const approveUser = async (id) => {
     try {
+      console.log("Approving user with ID:", id); // Debugging log
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/users/approve/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/users/approve/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error ${response.status}: Unable to approve user.`);
@@ -94,7 +94,7 @@ const Users = () => {
       );
       alert("User approved successfully.");
     } catch (err) {
-      console.error(err);
+      console.error("Approve User Error:", err.message);
       alert("Failed to approve user. Please try again later.");
     }
   };
@@ -102,8 +102,11 @@ const Users = () => {
   // Delete user
   const deleteUser = async (id) => {
     try {
+      console.log("Deleting user with ID:", id); // Debugging log
       const token = localStorage.getItem("token");
-      const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this user?"
+      );
       if (!confirmDelete) return;
 
       const response = await fetch(`http://localhost:5000/api/users/${id}`, {
@@ -123,7 +126,7 @@ const Users = () => {
       );
       alert("User deleted successfully.");
     } catch (err) {
-      console.error(err);
+      console.error("Delete User Error:", err.message);
       alert("Failed to delete user. Please try again later.");
     }
   };
@@ -150,6 +153,8 @@ const Users = () => {
 
   return (
     <div style={{ padding: "20px" }}>
+    <br />
+    <br />
       <h1>Users</h1>
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
@@ -158,29 +163,69 @@ const Users = () => {
         placeholder="Search by name"
         value={searchQuery}
         onChange={handleSearch}
+        style={{
+          marginBottom: "20px",
+          padding: "10px",
+          width: "100%",
+          maxWidth: "400px",
+        }}
       />
-      <table>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          <tr>
-            <th>Title</th>
-            <th>Lastname</th>
-            <th>Firstname</th>
-            <th>Role</th>
-            <th>Actions</th>
+          <tr style={{ backgroundColor: "#f2f2f2" }}>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Title</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+              Lastname
+            </th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+              Firstname
+            </th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+              Office
+            </th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Role</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Status</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
           {currentUsers.map((user) => (
             <tr key={user._id}>
-              <td>{user.title}</td>
-              <td>{user.lastname}</td>
-              <td>{user.firstname}</td>
-              <td>{user.role}</td>
-              <td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                {user.title}
+              </td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                {user.lastname}
+              </td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                {user.firstname}
+              </td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                {user.office}
+              </td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                {user.role}
+              </td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                {user.isApproved ? "Approved" : "Pending Approval"}
+              </td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                 {!user.isApproved && (
-                  <button onClick={() => approveUser(user._id)}>Approve</button>
+                  <button
+                    onClick={() => approveUser(user._id)}
+                    style={{ marginRight: "10px" }}
+                  >
+                    Approve
+                  </button>
                 )}
-                <button onClick={() => deleteUser(user._id)}>Delete</button>
+                <button
+                  onClick={() => deleteUser(user._id)}
+                  style={{ marginRight: "10px" }}
+                >
+                  Delete
+                </button>
                 <Link to={`/edituser/${user._id}`}>
                   <button>Edit</button>
                 </Link>
@@ -189,11 +234,23 @@ const Users = () => {
           ))}
         </tbody>
       </table>
-      <div>
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
         {Array.from(
           { length: Math.ceil(filteredUsers.length / usersPerPage) },
           (_, index) => (
-            <button key={index + 1} onClick={() => paginate(index + 1)}>
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              style={{
+                padding: "10px",
+                margin: "0 5px",
+                backgroundColor: currentPage === index + 1 ? "#007bff" : "#ddd",
+                color: currentPage === index + 1 ? "#fff" : "#000",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
               {index + 1}
             </button>
           )
