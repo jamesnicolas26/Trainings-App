@@ -48,6 +48,7 @@ const AddTraining = ({ addTraining }) => {
     fetchAuthors();
   }, []);
   
+  const today = new Date().toISOString().split("T")[0];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -282,6 +283,7 @@ const AddTraining = ({ addTraining }) => {
             name="startDate"
             value={formData.startDate}
             onChange={handleChange}
+            max={today}
             required
             style={{
               width: "100%",
@@ -308,6 +310,7 @@ const AddTraining = ({ addTraining }) => {
             name="endDate"
             value={formData.endDate}
             onChange={handleChange}
+            max={today}
             required
             style={{
               width: "100%",
