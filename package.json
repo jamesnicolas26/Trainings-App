@@ -1,0 +1,12 @@
+{
+    "name": "pdrrmo",
+    "version": "1.0.0",
+    "description": "A project for PDRRMO",
+    "main": "index.js",
+    "scripts": {
+      "start": "concurrently \"cd pdrrmo-training && npm start\" \"cd pdrrmo-backend && node server\""
+    },
+    "dependencies": {},
+    "devDependencies": {}
+  }
+  
