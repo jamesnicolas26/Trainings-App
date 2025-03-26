@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Auth/AuthContext"; // Assuming the AuthContext is located here
 
 const AddTraining = ({ addTraining }) => {
+  const { user } = useAuth(); // Get the current user's info from AuthContext
   const [formData, setFormData] = useState({
     title: "",
     type: "",
@@ -22,32 +24,42 @@ const AddTraining = ({ addTraining }) => {
   useEffect(() => {
     const fetchAuthors = async () => {
       try {
-        // Retrieve token from localStorage (or other storage if used)
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Authentication token not found");
-  
-        // Send a request with the Authorization header
+
         const response = await fetch("http://localhost:5000/api/users", {
           headers: {
-            Authorization: `Bearer ${token}`, // Include the token
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
-  
+
         if (!response.ok) {
           throw new Error("Failed to fetch authors");
         }
-  
+
         const data = await response.json();
-        setAuthors(data); // Update authors state with fetched data
+        setAuthors(data);
       } catch (error) {
         console.error("Error fetching authors:", error.message);
       }
     };
-  
+
     fetchAuthors();
   }, []);
-  
+
+  // Automatically set author and office for "Member" role
+  useEffect(() => {
+    console.log("User data:", user);
+    if (user?.role === "Member") {
+      setFormData((prev) => ({
+        ...prev,
+        author: `${user.firstname} ${user.lastname}`,
+        office: user.office,
+      }));
+    }
+  }, [user]);
+
   const today = new Date().toISOString().split("T")[0];
 
   const handleChange = (e) => {
@@ -104,47 +116,14 @@ const AddTraining = ({ addTraining }) => {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "600px",
-        margin: "20px auto",
-        padding: "20px",
-        border: "1px solid #ccc",
-        borderRadius: "10px",
-        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-      }}
-    >
+    <div style={{ maxWidth: "600px", margin: "20px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px", boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}>
       <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Add Training</h1>
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "15px" }}
-      >
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
         {/* Title */}
         <div>
-          <label
-            style={{
-              display: "block",
-              marginBottom: "5px",
-              fontWeight: "bold",
-            }}
-          >
-            Title:
-          </label>
-          <select
-            required
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            style={{
-              width: "100%",
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-            }}
-          >
-            <option value="" disabled>
-              Select Training Title
-            </option>
+          <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Title:</label>
+          <select required name="title" value={formData.title} onChange={handleChange} style={{ width: "100%", padding: "10px", border: "1px solid #ccc", borderRadius: "5px" }}>
+            <option value="" disabled>Select Training Title</option>
             <option disabled>BASIC COURSES:</option>
             <option value="DRRM Course">DRRM Course</option>
             <option value="Community-Based DRRM Training">
@@ -375,65 +354,25 @@ const AddTraining = ({ addTraining }) => {
 
         {/* Author */}
         <div>
-          <label
-            style={{
-              display: "block",
-              marginBottom: "5px",
-              fontWeight: "bold",
-            }}
-          >
-            Author:
-          </label>
-          <select
-            required
-            name="author"
-            value={formData.author}
-            onChange={handleChange}
-            style={{
-              width: "100%",
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-            }}
-          >
-            <option value="" disabled>
-              Select Author
-            </option>
-            {authors.map((author) => (
-              <option
-                key={author._id}
-                value={`${author.firstname} ${author.lastname}`}
-              >
-                {author.firstname} {author.lastname}
-              </option>
-            ))}
-          </select>
+          <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Author:</label>
+          {user?.role === "Member" ? (
+            <input type="text" name="author" value={formData.author} readOnly style={{ width: "100%", padding: "10px", border: "1px solid #ccc", borderRadius: "5px", backgroundColor: "#f9f9f9" }} />
+          ) : (
+            <select required name="author" value={formData.author} onChange={handleChange} style={{ width: "100%", padding: "10px", border: "1px solid #ccc", borderRadius: "5px" }}>
+              <option value="" disabled>Select Author</option>
+              {authors.map((author) => (
+                <option key={author._id} value={`${author.firstname} ${author.lastname}`}>
+                  {author.firstname} {author.lastname}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {/* Office */}
         <div>
-          <label
-            style={{
-              display: "block",
-              marginBottom: "5px",
-              fontWeight: "bold",
-            }}
-          >
-            Office:
-          </label>
-          <input
-            type="text"
-            name="office"
-            value={formData.office}
-            readOnly
-            style={{
-              width: "100%",
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-              backgroundColor: "#f9f9f9",
-            }}
-          />
+          <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Office:</label>
+          <input type="text" name="office" value={formData.office} readOnly style={{ width: "100%", padding: "10px", border: "1px solid #ccc", borderRadius: "5px", backgroundColor: "#f9f9f9" }} />
         </div>
 
         {/* Certificate */}
@@ -458,34 +397,12 @@ const AddTraining = ({ addTraining }) => {
           />
         </div>
 
-        {/* Buttons */}
+        {/* Submit and Cancel Buttons */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <button
-            type="submit"
-            style={{
-              backgroundColor: "#007BFF",
-              color: "#fff",
-              padding: "10px 20px",
-              border: "none",
-              borderRadius: "5px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
+          <button type="submit" style={{ backgroundColor: "#007BFF", color: "#fff", padding: "10px 20px", border: "none", borderRadius: "5px", fontWeight: "bold", cursor: "pointer" }}>
             Add Training
           </button>
-          <button
-            type="button"
-            onClick={() => navigate("/trainings")}
-            style={{
-              backgroundColor: "#e74c3c",
-              color: "#fff",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
+          <button type="button" onClick={() => navigate("/trainings")} style={{ backgroundColor: "#e74c3c", color: "#fff", padding: "10px 20px", borderRadius: "5px", border: "none", cursor: "pointer" }}>
             Cancel
           </button>
         </div>

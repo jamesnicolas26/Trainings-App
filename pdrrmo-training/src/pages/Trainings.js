@@ -2,15 +2,21 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import PropTypes from "prop-types";
+import { useAuth } from "../Auth/AuthContext";
 
 const Trainings = ({ trainings, deleteTraining }) => {
+  const { user } = useAuth(); // Access the user from AuthContext
+  const [userRole, setUserRole] = useState(user?.role || ""); // Default to user role from context
   const [filterType, setFilterType] = useState("");
-  const [filterOffice, setFilterOffice] = useState("");
-  const [filterAuthor, setFilterAuthor] = useState("");
   const [filterYear, setFilterYear] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [selectedCertificate, setSelectedCertificate] = useState(null);
+
+  // Admin-specific filters
+  const [filterOffice, setFilterOffice] = useState("");
+  const [filterAuthor, setFilterAuthor] = useState("");
 
   const imgStyle = {
     width: "120px",
@@ -38,6 +44,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
 
   const buttonStyle = {
     padding: "10px 15px",
+    textDecoration: "none",
     marginRight: "10px",
     backgroundColor: "#4CAF50",
     color: "#fff",
@@ -104,8 +111,6 @@ const Trainings = ({ trainings, deleteTraining }) => {
 
   const handleFilterChange = (e) => setFilterType(e.target.value);
   const handleSearchChange = (e) => setSearchQuery(e.target.value);
-  const handleOfficeChange = (e) => setFilterOffice(e.target.value);
-  const handleAuthorChange = (e) => setFilterAuthor(e.target.value);
   const handleYearChange = (e) => setFilterYear(e.target.value);
 
   const handleSort = (key) => {
@@ -128,9 +133,11 @@ const Trainings = ({ trainings, deleteTraining }) => {
   const filteredTrainings = sortedTrainings.filter((training) => {
     const matchesFilter =
       (filterType === "" || training.type.toLowerCase() === filterType.toLowerCase()) &&
-      (filterOffice === "" || (training.office && training.office.toLowerCase().includes(filterOffice.toLowerCase()))) &&
-      (filterAuthor === "" || training.author.toLowerCase().includes(filterAuthor.toLowerCase())) &&
-      (filterYear === "" || (training.startDate && training.startDate.includes(filterYear)));
+      (filterYear === "" || (training.startDate && training.startDate.includes(filterYear))) &&
+      (userRole === "Admin"
+        ? (filterOffice === "" || (training.office && training.office.toLowerCase().includes(filterOffice.toLowerCase()))) &&
+          (filterAuthor === "" || training.author.toLowerCase().includes(filterAuthor.toLowerCase()))
+        : true);
 
     const matchesSearch =
       searchQuery === "" || training.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -144,26 +151,42 @@ const Trainings = ({ trainings, deleteTraining }) => {
   };
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") setSelectedCertificate(null);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+    if (!userRole) {
+      console.warn("User role is missing in context. Fetching from backend...");
+      // Fetch the user role if it is not present in the context
+      (async () => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        try {
+          const response = await fetch("http://localhost:5000/api/user/profile", {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (!response.ok) throw new Error("Failed to fetch user role.");
+
+          const data = await response.json();
+          setUserRole(data.role);
+        } catch (error) {
+          console.error("Error fetching user role:", error.message);
+        }
+      })();
+    }
+  }, [userRole]);
 
   return (
     <div style={containerStyle}>
       <div style={headerStyle}>
         <h1>Trainings</h1>
         <div>
-          <button onClick={exportToExcel} style={buttonStyle}>
+          <Link to="/addtraining" style={buttonStyle}>
+            Add Training
+          </Link>
+
+          <button style={buttonStyle} onClick={exportToExcel}>
             Export to Excel
           </button>
-          <Link to="/addtraining">
-            <button style={{ ...buttonStyle, backgroundColor: "#008CBA" }}>
-              Add Training
-            </button>
-          </Link>
         </div>
       </div>
       <div style={{ marginBottom: "20px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
@@ -184,20 +207,24 @@ const Trainings = ({ trainings, deleteTraining }) => {
           <option value="Managerial">Managerial</option>
           <option value="Technical">Technical</option>
         </select>
-        <input
-          type="text"
-          placeholder="Filter by office..."
-          value={filterOffice}
-          onChange={handleOfficeChange}
-          style={{ padding: "10px", flexGrow: 1, borderRadius: "5px", border: "1px solid #ddd" }}
-        />
-        <input
-          type="text"
-          placeholder="Filter by author..."
-          value={filterAuthor}
-          onChange={handleAuthorChange}
-          style={{ padding: "10px", flexGrow: 1, borderRadius: "5px", border: "1px solid #ddd" }}
-        />
+        {userRole === "Admin" && (
+          <>
+            <input
+              type="text"
+              placeholder="Filter by office..."
+              value={filterOffice}
+              onChange={(e) => setFilterOffice(e.target.value)}
+              style={{ padding: "10px", flexGrow: 1, borderRadius: "5px", border: "1px solid #ddd" }}
+            />
+            <input
+              type="text"
+              placeholder="Filter by author..."
+              value={filterAuthor}
+              onChange={(e) => setFilterAuthor(e.target.value)}
+              style={{ padding: "10px", flexGrow: 1, borderRadius: "5px", border: "1px solid #ddd" }}
+            />
+          </>
+        )}
         <input
           type="text"
           placeholder="Filter by year..."
@@ -294,7 +321,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
           </tbody>
         </table>
       ) : (
-        <p>No trainings available.</p>
+        <p>No trainings found. Try adjusting the filters or search term.</p>
       )}
       {selectedCertificate && (
         <div
@@ -302,12 +329,12 @@ const Trainings = ({ trainings, deleteTraining }) => {
             position: "fixed",
             top: 0,
             left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
+            justifyContent: "center",
             zIndex: 1000,
           }}
           onClick={() => setSelectedCertificate(null)}
@@ -315,12 +342,23 @@ const Trainings = ({ trainings, deleteTraining }) => {
           <img
             src={selectedCertificate}
             alt="Certificate"
-            style={{ maxHeight: "90%", maxWidth: "90%" }}
+            style={{
+              maxWidth: "90%",
+              maxHeight: "90%",
+              border: "3px solid white",
+              borderRadius: "10px",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.5)",
+            }}
           />
         </div>
       )}
     </div>
   );
+};
+
+Trainings.propTypes = {
+  trainings: PropTypes.array.isRequired,
+  deleteTraining: PropTypes.func.isRequired,
 };
 
 export default Trainings;

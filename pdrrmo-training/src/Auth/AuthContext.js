@@ -10,9 +10,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userData) => {
     try {
+      if (!userData.role) {
+        console.error("Role is missing in user data during login.");
+        throw new Error("User role is required.");
+      }
       setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData)); // Store user details including JWT token
-      localStorage.setItem("token", userData.token); // Save token separately
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", userData.token);
     } catch (error) {
       console.error("Error during login:", error);
     }
@@ -21,13 +25,12 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
-    localStorage.removeItem("token"); // Ensure token is cleared during logout
+    localStorage.removeItem("token");
   };
 
   const clearAndRegenerateToken = async () => {
     try {
       const oldToken = localStorage.getItem("token");
-
       if (!oldToken) {
         console.error("No token found to refresh.");
         return;
@@ -46,9 +49,20 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      localStorage.setItem("token", data.token); // Save the new token
-      setUser((prevUser) => ({ ...prevUser, token: data.token })); // Update user state
-      console.log("New token generated:", data.token);
+      setUser((prevUser) => ({
+        ...prevUser,
+        token: data.token,
+        role: data.role || prevUser.role, // Ensure role is preserved or updated
+      }));
+      localStorage.setItem("token", data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...user,
+          token: data.token,
+          role: data.role || user?.role,
+        })
+      );
     } catch (error) {
       console.error("Error regenerating token:", error.message);
     }
@@ -59,10 +73,10 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("token");
 
       if (token) {
-        const tokenExpiry = JSON.parse(atob(token.split(".")[1])).exp * 1000; // Decode JWT and get expiry
+        const tokenExpiry = JSON.parse(atob(token.split(".")[1])).exp * 1000;
         const now = Date.now();
 
-        if (tokenExpiry - now < 5 * 60 * 1000) { // Refresh if less than 5 minutes left
+        if (tokenExpiry - now < 5 * 60 * 1000) {
           await clearAndRegenerateToken();
         }
       }
@@ -74,7 +88,16 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = Boolean(user);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, clearAndRegenerateToken }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        currentUser: user,
+        login,
+        logout,
+        isAuthenticated,
+        clearAndRegenerateToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

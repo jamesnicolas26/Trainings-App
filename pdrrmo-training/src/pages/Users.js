@@ -13,23 +13,22 @@ const Users = () => {
   // Fetch users from API
   useEffect(() => {
     const fetchUsers = async () => {
-      setLoading(true);
       try {
         const token = localStorage.getItem("token");
-
+  
         if (!token) {
           alert("Authentication error. Please log in again.");
           window.location.href = "/";
           return;
         }
-
+  
         const response = await fetch("http://localhost:5000/api/users", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
             alert("Unauthorized access. Please log in again.");
@@ -39,9 +38,9 @@ const Users = () => {
           }
           throw new Error(`Error ${response.status}: Unable to fetch users.`);
         }
-
+  
         const data = await response.json();
-
+  
         const formattedUsers = data.map((user) => ({
           _id: user._id,
           title: user.title || "",
@@ -53,19 +52,29 @@ const Users = () => {
           isApproved: user.isApproved || false,
           role: user.role || "User",
         }));
-
+  
         setUsers(formattedUsers);
-        setFilteredUsers(formattedUsers);
+        setFilteredUsers((prevFiltered) => {
+          if (!searchQuery) return formattedUsers;
+          const query = searchQuery.toLowerCase();
+          return formattedUsers.filter(
+            (user) =>
+              user.firstname.toLowerCase().includes(query) ||
+              user.lastname.toLowerCase().includes(query)
+          );
+        });
       } catch (err) {
         console.error(err.message);
         setError("Failed to load users. Please try again later.");
-      } finally {
-        setLoading(false);
       }
     };
-
-    fetchUsers();
-  }, []);
+  
+    fetchUsers(); // Fetch immediately
+  
+    const interval = setInterval(fetchUsers, 500); // Fetch every 0.5 seconds
+  
+    return () => clearInterval(interval); // Clean up on component unmount
+  }, [searchQuery]); // Re-fetch if search query changes  
 
   // Approve user
   const approveUser = async (id) => {
@@ -156,7 +165,6 @@ const Users = () => {
     <br />
     <br />
       <h1>Users</h1>
-      {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
       <input
         type="text"

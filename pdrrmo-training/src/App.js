@@ -11,9 +11,11 @@ import Logout from "./components/Logout";
 import PrivateRoute from "./Auth/PrivateRoute";
 import { AuthProvider, useAuth } from "./Auth/AuthContext";
 import RoleProtectedRoute from "./Auth/RoleProtectedRoute";
+import PropTypes from "prop-types";
 
 export default function App() {
-  const { clearAndRegenerateToken } = useAuth();
+  const { clearAndRegenerateToken, currentUser } = useAuth();
+
   const [users, setUsers] = useState(() => {
     try {
       const savedUsers = localStorage.getItem("users");
@@ -34,7 +36,6 @@ export default function App() {
     }
   });
 
-  // Automatically refresh the token on app load
   useEffect(() => {
     const refreshToken = async () => {
       try {
@@ -62,30 +63,37 @@ export default function App() {
     }
   }, [trainings]);
 
-  const addUser = (user) => {
-    setUsers((prevUsers) => [...prevUsers, user]);
-  };
+  const addUser = (user) => setUsers((prev) => [...prev, user]);
 
-  const deleteUser = (index) => {
-    setUsers((prevUsers) => prevUsers.filter((_, i) => i !== index));
-  };
+  const deleteUser = (index) => setUsers((prev) => prev.filter((_, i) => i !== index));
 
   const updateUser = (index, updatedUser) => {
-    setUsers((prevUsers) => {
-      const updatedUsers = [...prevUsers];
+    setUsers((prev) => {
+      const updatedUsers = [...prev];
       updatedUsers[index] = updatedUser;
       return updatedUsers;
     });
   };
 
-  const addTraining = (training) => {
-    setTrainings((prevTrainings) => [...prevTrainings, training]);
-  };
+  const addTraining = (training) => setTrainings((prev) => [...prev, training]);
 
-  const deleteTraining = (index) => {
-    setTrainings((prevTrainings) =>
-      prevTrainings.filter((_, i) => i !== index)
-    );
+  const deleteTraining = (index) => setTrainings((prev) => prev.filter((_, i) => i !== index));
+
+  Trainings.propTypes = {
+    trainings: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        type: PropTypes.string.isRequired,
+        startDate: PropTypes.string.isRequired,
+        endDate: PropTypes.string.isRequired,
+        hours: PropTypes.number,
+        sponsor: PropTypes.string,
+        author: PropTypes.string,
+        certificate: PropTypes.string,
+      })
+    ).isRequired,
+    deleteTraining: PropTypes.func.isRequired,
+    userRole: PropTypes.string,
   };
 
   return (
@@ -104,7 +112,11 @@ export default function App() {
           path="/trainings"
           element={
             <PrivateRoute>
-              <Trainings trainings={trainings} deleteTraining={deleteTraining} />
+              <Trainings
+                trainings={trainings}
+                deleteTraining={deleteTraining}
+                userRole={currentUser?.role}
+              />
             </PrivateRoute>
           }
         />
@@ -127,7 +139,7 @@ export default function App() {
         <Route
           path="/edituser/:id"
           element={
-            <PrivateRoute requiredRole={"Admin"}>
+            <PrivateRoute requiredRole="Admin">
               <EditUser users={users} updateUser={updateUser} />
             </PrivateRoute>
           }
