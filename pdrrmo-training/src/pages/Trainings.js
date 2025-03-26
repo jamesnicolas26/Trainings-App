@@ -131,20 +131,29 @@ const Trainings = ({ trainings, deleteTraining }) => {
   });
 
   const filteredTrainings = sortedTrainings.filter((training) => {
+    // Check if the user is the author of the training
+    const isAuthor = training.author === user.firstname + " " + user.lastname;
+  
+    // Admins see all trainings; non-admins see only their own
+    const canView =
+      userRole === "Admin" || isAuthor;
+  
+    // Apply filters for type, year, office, and author
     const matchesFilter =
       (filterType === "" || training.type.toLowerCase() === filterType.toLowerCase()) &&
       (filterYear === "" || (training.startDate && training.startDate.includes(filterYear))) &&
       (userRole === "Admin"
         ? (filterOffice === "" || (training.office && training.office.toLowerCase().includes(filterOffice.toLowerCase()))) &&
           (filterAuthor === "" || training.author.toLowerCase().includes(filterAuthor.toLowerCase()))
-        : true);
-
+        : true); // Non-admins cannot filter by office or author
+  
+    // Apply search query
     const matchesSearch =
       searchQuery === "" || training.title.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesFilter && matchesSearch;
+  
+    return canView && matchesFilter && matchesSearch;
   });
-
+  
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return null;
     return sortConfig.direction === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
@@ -298,23 +307,22 @@ const Trainings = ({ trainings, deleteTraining }) => {
                   )}
                 </td>
                 <td style={thTdStyle}>
-                  <button
-                    onClick={() =>
-                      window.confirm(
-                        "Are you sure you want to delete this training?"
-                      ) && deleteTraining(index)
-                    }
-                    style={{
-                      padding: "5px 10px",
-                      backgroundColor: "#FF4D4D",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "5px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Delete
-                  </button>
+                    <button
+                      onClick={() =>
+                        window.confirm("Are you sure you want to delete this training?") &&
+                        deleteTraining(index)
+                      }
+                      style={{
+                        padding: "5px 10px",
+                        backgroundColor: "#FF4D4D",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete
+                    </button>
                 </td>
               </tr>
             ))}
