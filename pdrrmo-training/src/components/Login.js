@@ -91,7 +91,7 @@ const Login = () => {
         <p style={{ color: "#7f8c8d", marginBottom: "1.5rem" }}>
           Welcome! Please log in to continue.
         </p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
           <div style={{ marginBottom: "1rem" }}>
             <label
               htmlFor="username"
@@ -108,6 +108,7 @@ const Login = () => {
               onChange={handleChange}
               style={inputStyle}
               aria-label="Username"
+              autoComplete="off"
             />
           </div>
           <div style={{ marginBottom: "1.5rem" }}>
@@ -126,6 +127,7 @@ const Login = () => {
               onChange={handleChange}
               style={inputStyle}
               aria-label="Password"
+              autoComplete="off"
             />
           </div>
           <button

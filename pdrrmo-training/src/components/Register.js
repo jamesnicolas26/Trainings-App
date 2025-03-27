@@ -71,6 +71,8 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const isFieldEmpty = (field) => !formData[field];
+
   const validateForm = () => {
     const {
         title,
@@ -191,18 +193,16 @@ const Register = () => {
 
   return (
     <div style={containerStyle}>
-      <br />
-      <br />
-      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>
-        Register User
-      </h1>
+    <br />
+    <br />
+      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Register User</h1>
       <form onSubmit={handleSubmit}>
         <div style={gridStyle}>
-          {/* Title */}
           <div>
-            <label style={labelStyle}>Title</label>
+            <label style={labelStyle}>
+              Title {isFieldEmpty("title") && <span style={{ color: "red" }}>*</span>}
+            </label>
             <select
-              required
               name="title"
               value={formData.title}
               onChange={handleChange}
@@ -212,20 +212,14 @@ const Register = () => {
               <option value="Mr.">Mr.</option>
               <option value="Ms.">Ms.</option>
               <option value="Mrs.">Mrs.</option>
-              <option value="Dr.">Dr.</option>
-              <option value="Dra.">Dra.</option>
-              <option value="Prof.">Prof.</option>
-              <option value="Engr.">Engr.</option>
-              <option value="FSupt.">FSupt.</option>
-              <option value="Atty.">Atty.</option>
             </select>
           </div>
 
-          {/* Last Name */}
           <div>
-            <label style={labelStyle}>Last Name</label>
+            <label style={labelStyle}>
+              Last Name {isFieldEmpty("lastname") && <span style={{ color: "red" }}>*</span>}
+            </label>
             <input
-              required
               type="text"
               name="lastname"
               value={formData.lastname}
@@ -235,11 +229,11 @@ const Register = () => {
             />
           </div>
 
-          {/* First Name */}
           <div>
-            <label style={labelStyle}>First Name</label>
+            <label style={labelStyle}>
+              First Name {isFieldEmpty("firstname") && <span style={{ color: "red" }}>*</span>}
+            </label>
             <input
-              required
               type="text"
               name="firstname"
               value={formData.firstname}
@@ -249,9 +243,8 @@ const Register = () => {
             />
           </div>
 
-          {/* Middle Name */}
           <div>
-            <label style={labelStyle}>Middle Name</label>
+            <label style={labelStyle}>Middle Name (Optional)</label>
             <input
               type="text"
               name="middlename"
@@ -262,11 +255,11 @@ const Register = () => {
             />
           </div>
 
-          {/* Office */}
-          <div style={{ gridColumn: "span 2" }}>
-            <label style={labelStyle}>Office</label>
+          <div>
+            <label style={labelStyle}>
+              Office {isFieldEmpty("office") && <span style={{ color: "red" }}>*</span>}
+            </label>
             <select
-              required
               name="office"
               value={formData.office}
               onChange={handleChange}
@@ -282,12 +275,12 @@ const Register = () => {
           </div>
         </div>
 
-        {/* Username, Role, Password */}
         <div style={gridStyle}>
           <div>
-            <label style={labelStyle}>Username</label>
+            <label style={labelStyle}>
+              Username {isFieldEmpty("username") && <span style={{ color: "red" }}>*</span>}
+            </label>
             <input
-              required
               type="text"
               name="username"
               value={formData.username}
@@ -297,28 +290,11 @@ const Register = () => {
             />
           </div>
 
-          {/* Role */}
-          {/*
           <div>
-            <label style={labelStyle}>Role</label>
-            <select
-              required
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              style={inputStyle}
-            >
-              <option value="">Select Role</option>
-              <option value="Admin">Admin</option>
-              <option value="Member">Member</option>
-            </select>
-          </div>
-          */}
-
-          <div>
-            <label style={labelStyle}>Password</label>
+            <label style={labelStyle}>
+              Password {isFieldEmpty("password") && <span style={{ color: "red" }}>*</span>}
+            </label>
             <input
-              required
               type="password"
               name="password"
               value={formData.password}
@@ -329,9 +305,10 @@ const Register = () => {
           </div>
 
           <div>
-            <label style={labelStyle}>Confirm Password</label>
+            <label style={labelStyle}>
+              Confirm Password {isFieldEmpty("confirmPassword") && <span style={{ color: "red" }}>*</span>}
+            </label>
             <input
-              required
               type="password"
               name="confirmPassword"
               value={formData.confirmPassword}
