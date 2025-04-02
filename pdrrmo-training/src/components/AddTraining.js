@@ -145,6 +145,18 @@ const AddTraining = ({ addTraining }) => {
             <option value="Risk Communication Training">
               Risk Communication Training
             </option>
+            <option value="Orientation Workshop on Public Sector Employee's Organization">
+              Orientation Workshop on Public Sector Employee's Organization
+            </option>
+            <option value="Fundamentals of Stock Market">
+              Fundamentals of Stock Market
+            </option>
+            <option value="Managing Emotions in the Workplace: Enhancement of Self-Care Strategies">
+              Managing Emotions in the Workplace: Enhancement of Self-Care Strategies
+            </option>
+            <option value="Managing Financial Risks in the Workplace: Strategies for Risk Management">
+              Managing Financial Risks in the Workplace: Strategies for Risk Management
+            </option>
             <option value="Basic Incident Command System Training">
               Basic Incident Command System Training
             </option>

@@ -77,7 +77,7 @@ function Home() {
         </h2>
         <ul style={{ listStyle: "none", padding: 0, color: "#374151" }}>
           <li>📢 Typhoon Preparedness Training - March 15, 2025</li>
-          <li>🌍 Earthquake Drill Report - February 28, 2025</li>
+          <li>🌍 Earthquake Drill Report - March 12, 2025</li>
           <li>🚨 New Emergency Hotlines Announced</li>
         </ul>
       </div>
