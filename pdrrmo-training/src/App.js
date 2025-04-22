@@ -131,7 +131,7 @@ export default function App() {
         <Route
           path="/users"
           element={
-            <RoleProtectedRoute requiredRole="Admin">
+            <RoleProtectedRoute requiredRole={["Admin", "superadmin"]}>
               <Users users={users} deleteUser={deleteUser} />
             </RoleProtectedRoute>
           }
@@ -139,7 +139,7 @@ export default function App() {
         <Route
           path="/edituser/:id"
           element={
-            <PrivateRoute requiredRole="Admin">
+            <PrivateRoute requiredRole={["Admin", "superadmin"]}>
               <EditUser users={users} updateUser={updateUser} />
             </PrivateRoute>
           }

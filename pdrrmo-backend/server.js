@@ -17,6 +17,9 @@ app.use(express.json());
 app.use("/", authRoutes); // Handles /login and /register
 app.use("/api/users", authenticate, userRoutes); // Protected user-related routes
 
+app.use(express.json({ limit: '50mb' })); // For JSON payloads
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 // Catch-All for Invalid Routes
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });

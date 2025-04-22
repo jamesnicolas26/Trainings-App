@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   middlename: { type: String, default: "" },
   office: { type: String, default: "" },
   username: { type: String, required: true, unique: true },
-  role: { type: String, required: true },
+  role: { type: String, enum: ["Member", "Admin", "superadmin"], required: true },
   password: { type: String, required: true },
   isApproved: { type: Boolean, default: false },
 });

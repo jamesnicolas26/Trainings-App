@@ -12,7 +12,7 @@ const PrivateRoute = ({ children, requiredRole }) => {
   }
 
   // If a required role is specified, ensure the user's role matches
-  if (requiredRole && user?.role !== requiredRole) {
+  if (requiredRole && !requiredRole.includes(user?.role)) {
     return <Navigate to="/home" state={{ from: location }} replace />;
   }
 

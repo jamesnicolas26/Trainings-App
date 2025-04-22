@@ -220,24 +220,28 @@ const Users = () => {
                 {user.isApproved ? "Approved" : "Pending Approval"}
               </td>
               <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                {!user.isApproved && (
+              {user.role !== "superadmin" && (
+                <>
+                  {!user.isApproved && (
+                    <button
+                      onClick={() => approveUser(user._id)}
+                      style={{ marginRight: "10px" }}
+                    >
+                      Approve
+                    </button>
+                  )}
                   <button
-                    onClick={() => approveUser(user._id)}
+                    onClick={() => deleteUser(user._id)}
                     style={{ marginRight: "10px" }}
                   >
-                    Approve
+                    Delete
                   </button>
-                )}
-                <button
-                  onClick={() => deleteUser(user._id)}
-                  style={{ marginRight: "10px" }}
-                >
-                  Delete
-                </button>
-                <Link to={`/edituser/${user._id}`}>
-                  <button>Edit</button>
-                </Link>
-              </td>
+                  <Link to={`/edituser/${user._id}`}>
+                    <button>Edit</button>
+                  </Link>
+                </>
+              )}
+            </td>
             </tr>
           ))}
         </tbody>

@@ -136,13 +136,13 @@ const Trainings = ({ trainings, deleteTraining }) => {
   
     // Admins see all trainings; non-admins see only their own
     const canView =
-      userRole === "Admin" || isAuthor;
+      userRole === "Admin" || userRole === "superadmin" ||isAuthor;
   
     // Apply filters for type, year, office, and author
     const matchesFilter =
       (filterType === "" || training.type.toLowerCase() === filterType.toLowerCase()) &&
       (filterYear === "" || (training.startDate && training.startDate.includes(filterYear))) &&
-      (userRole === "Admin"
+      (userRole === "Admin" || userRole === "superadmin"
         ? (filterOffice === "" || (training.office && training.office.toLowerCase().includes(filterOffice.toLowerCase()))) &&
           (filterAuthor === "" || training.author.toLowerCase().includes(filterAuthor.toLowerCase()))
         : true); // Non-admins cannot filter by office or author
@@ -216,7 +216,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
           <option value="Managerial">Managerial</option>
           <option value="Technical">Technical</option>
         </select>
-        {userRole === "Admin" && (
+        {userRole === "Admin" || userRole === "superadmin" && (
           <>
             <input
               type="text"

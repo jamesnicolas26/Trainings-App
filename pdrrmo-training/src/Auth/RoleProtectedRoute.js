@@ -5,7 +5,16 @@ import { useAuth } from "./AuthContext";
 const RoleProtectedRoute = ({ children, requiredRole }) => {
   const { user } = useAuth();
 
-  if (!user || user.role !== requiredRole) {
+  if (!user) {
+    alert("Access denied. User not logged in.");
+    return <Navigate to="/" />;
+  }
+
+  const hasAccess = Array.isArray(requiredRole)
+    ? requiredRole.includes(user.role)
+    : user.role === requiredRole;
+
+  if (!hasAccess) {
     alert("Access denied. You do not have the required permissions.");
     return <Navigate to="/home" />;
   }
