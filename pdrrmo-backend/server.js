@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const { authenticate } = require("./middleware/authMiddleware");
 const trainingTitleRoute = require("./routes/trainingTitles");
+const officeRoutes = require('./routes/officeRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -15,6 +16,8 @@ app.use(cors({ origin: "http://localhost:3000" })); // Allow requests from the f
 app.use(express.json());
 
 // Adjust the route paths for frontend compatibility
+app.use("/api/offices", officeRoutes);
+app.use("/offices", officeRoutes);
 app.use("/", authRoutes); // Handles /login and /register
 app.use("/api/users", authenticate, userRoutes); // Protected user-related routes
 app.use("/api/training-titles", trainingTitleRoute); // Training titles route

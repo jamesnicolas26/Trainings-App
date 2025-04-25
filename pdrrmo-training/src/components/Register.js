@@ -16,52 +16,18 @@ const Register = () => {
     confirmPassword: "",
   });
 
-  const [offices, setOffices] = useState([]);
+  const [offices, setOffices] = useState([]); // Make sure it's initialized as an empty array
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchOffices = async () => {
-      const officeList = [
-        "Office of the Governor",
-        "Office of the Governor - Personal Staff",
-        "Office of the Vice Governor",
-        "Office of the Vice Governor - Personal Staff",
-        "Office of the Secretary to the Sangguniang Panlalawigan",
-        "Bulacan Environment and Natural Resources Office",
-        "Bulacan Polytechnic College",
-        "Provincial Accounting Office",
-        "Provincial Administrator's Office",
-        "Provincial Agriculture Office",
-        "Provincial Budget Office",
-        "Provincial Civil Security and Jail Management Office",
-        "Provincial Cooperative and Enterprise Development Office",
-        "Provincial Engineer's Office",
-        "Provincial General Services Office",
-        "Provincial History, Arts, Culture and Tourism Office",
-        "Provincial Human Resource Management Office",
-        "Provincial Information Technology Office",
-        "Provincial Legal Office",
-        "Provincial Planning and Development Office",
-        "Provincial Public Affairs Office",
-        "Provincial Public Employment Service Office",
-        "Provincial Public Health Office",
-        "Provincial Social Welfare and Development Office",
-        "Provincial Treasurer's Office",
-        "Provincial Veterinary Office",
-        "Provincial Youth, Sports and Development Office",
-        "Department of Interior and Local Government",
-        "Philippine National Police - Bulacan",
-        "Office of the Provincial Fire Marshal",
-        "Philippine Red Cross Bulacan Chapter",
-        "Department of Public Works and Highways - District 1",
-        "Department of Public Works and Highways - District 2",
-        "Department of Trade and Industry",
-        "National Food Authority",
-        "Department of Education",
-        "Bulacan State University",
-        "Save the Children Philippines Luzon Program",
-      ];
-      setOffices(officeList); // Populate the dropdown menu
+      try {
+        const response = await fetch("http://localhost:5000/api/offices");
+        const data = await response.json();
+        setOffices(data.offices || []); // Safely set an empty array if no offices data
+      } catch (error) {
+        console.error("Error fetching offices:", error.message);
+      }
     };
 
     fetchOffices();
@@ -75,37 +41,37 @@ const Register = () => {
 
   const validateForm = () => {
     const {
-        title,
-        lastname,
-        firstname,
-        office,
-        username,
-        role,
-        password,
-        confirmPassword,
+      title,
+      lastname,
+      firstname,
+      office,
+      username,
+      role,
+      password,
+      confirmPassword,
     } = formData;
 
     if (
-        !title ||
-        !lastname ||
-        !firstname ||
-        !office ||
-        !username ||
-        !role ||
-        !password ||
-        !confirmPassword
+      !title ||
+      !lastname ||
+      !firstname ||
+      !office ||
+      !username ||
+      !role ||
+      !password ||
+      !confirmPassword
     ) {
-        alert("All fields are required.");
-        return false;
+      alert("All fields are required.");
+      return false;
     }
 
     if (password !== confirmPassword) {
-        alert("Passwords do not match!");
-        return false;
+      alert("Passwords do not match!");
+      return false;
     }
 
     return true;
-};
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -193,8 +159,6 @@ const Register = () => {
 
   return (
     <div style={containerStyle}>
-    <br />
-    <br />
       <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Register User</h1>
       <form onSubmit={handleSubmit}>
         <div style={gridStyle}>
@@ -266,11 +230,15 @@ const Register = () => {
               style={inputStyle}
             >
               <option value="">Select Office</option>
-              {offices.map((office, index) => (
-                <option key={index} value={office}>
-                  {office}
-                </option>
-              ))}
+              {offices.length > 0 ? (
+                offices.map((office, index) => (
+                  <option key={index} value={office.name}>
+                    {office.name}
+                  </option>
+                ))
+              ) : (
+                <option value="">No offices available</option>
+              )}
             </select>
           </div>
         </div>

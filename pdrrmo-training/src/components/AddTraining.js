@@ -22,6 +22,10 @@ const AddTraining = ({ addTraining }) => {
   const [newTitle, setNewTitle] = useState(""); // New title input
   const fileInputRef = useRef(null);
 
+  const [newOffice, setNewOffice] = useState(""); // For the AddOffice form
+  const [userRole, setUserRole] = useState(""); // User role for showing AddOffice
+  const [offices, setOffices] = useState([]); // Store fetched offices
+
   // Fetch training titles and authors
   useEffect(() => {
     const fetchData = async () => {
@@ -53,12 +57,46 @@ const AddTraining = ({ addTraining }) => {
     
         const authorsData = await authorsResponse.json();
         setAuthors(authorsData);
+
+        const officesResponse = await fetch("http://localhost:5000/offices", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!officesResponse.ok) {
+          throw new Error("Failed to fetch offices");
+        }
+
+        const officesData = await officesResponse.json();
+        setOffices(officesData);
+
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
-    };    
+    };
 
     fetchData();
+  }, []);
+
+  // Fetch user role
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/users", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const data = await response.json();
+        setUserRole(data.role); // Store user role
+      } catch (error) {
+        console.error("Error fetching user role:", error.message);
+      }
+    };
+
+    fetchUserRole();
   }, []);
 
   // Add a new training title
@@ -161,13 +199,44 @@ const AddTraining = ({ addTraining }) => {
     navigate("/trainings");
   };
 
+  // Handle Add Office form submission
+  const handleAddOffice = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+
+    if (!newOffice.trim()) {
+      alert("Office name cannot be empty.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/offices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ name: newOffice }),
+      });
+
+      if (response.ok) {
+        alert("Office added successfully.");
+        setNewOffice(""); // Reset the form field after successful submission
+      } else {
+        const data = await response.json();
+        alert(data.message || "Failed to add office.");
+      }
+    } catch (error) {
+      console.error("Error adding office:", error.message);
+      alert("An error occurred while adding the office.");
+    }
+  };
+
   return (
     <div>
       <div style={{ maxWidth: "600px", margin: "20px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px", boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}>
         <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Add Training</h1>
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          {/* Title */}
-          <div>
+        <div>
             <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Title:</label>
             <select required name="title" value={formData.title} onChange={handleChange} style={{ width: "100%", padding: "10px", border: "1px solid #ccc", borderRadius: "5px" }}>
               <option value="" disabled>Select Training Title</option>
@@ -373,7 +442,7 @@ const AddTraining = ({ addTraining }) => {
         </form>
       </div>
 
-      {/* CMS Section for Adding Titles */}
+      {/* CMS Section for Adding Titles (Visible to Superadmins only) */}
       {user?.role === "superadmin" && (
         <div style={{ maxWidth: "600px", margin: "20px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px", boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", marginTop: "30px" }}>
           <h2>Add New Training Title</h2>
@@ -387,6 +456,27 @@ const AddTraining = ({ addTraining }) => {
           <button onClick={handleAddTitle} style={{ padding: "10px 20px", backgroundColor: "#007BFF", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}>
             Add Title
           </button>
+        </div>
+      )}
+
+      {/* Add Office Section (Visible to Superadmins only) */}
+      {user?.role === "superadmin" && (
+        <div style={{ maxWidth: "600px", margin: "20px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px", boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}>
+          <h3>Add New Office</h3>
+          <form onSubmit={handleAddOffice}>
+            <div>
+              <label htmlFor="officeName">Office Name</label>
+              <input
+                id="officeName"
+                type="text"
+                value={newOffice}
+                onChange={(e) => setNewOffice(e.target.value)}
+                placeholder="Enter office name"
+                required
+              />
+            </div>
+            <button type="submit">Add Office</button>
+          </form>
         </div>
       )}
     </div>

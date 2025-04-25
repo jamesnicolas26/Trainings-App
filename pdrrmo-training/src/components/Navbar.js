@@ -1,17 +1,37 @@
 // src/components/Navbar.js
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom";
 
 const Navbar = () => {
-    const location = useLocation();
+  const [userRole, setUserRole] = useState(null);
+  const location = useLocation();
 
-    const hideNavbar = location.pathname.startsWith("/edituser/");
+  // Fetch user role on component load
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/users", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const data = await response.json();
+        setUserRole(data.role);  // Store the user role
+      } catch (error) {
+        console.error("Error fetching user role:", error.message);
+      }
+    };
 
-    if (hideNavbar) {
-        return null;
-    }
-    
+    fetchUserRole();
+  }, []);
+
+  // Hide navbar on specific pages
+  const hideNavbar = location.pathname.startsWith("/edituser/");
+  if (hideNavbar) {
+    return null;
+  }
+
   return (
     <nav
       style={{
@@ -38,6 +58,11 @@ const Navbar = () => {
         <li><Link to="/trainings" style={{ color: "#fff", textDecoration: "none" }}>Trainings</Link></li>
         <li><Link to="/users" style={{ color: "#fff", textDecoration: "none" }}>Users</Link></li>
         <li><Link to="/logout" style={{ color: "#fff", textDecoration: "none" }}>Logout</Link></li>
+
+        {/* Conditionally render Add Office link */}
+        {userRole === "superadmin" && (
+          <li><Link to="/add-office" style={{ color: "#fff", textDecoration: "none" }}>Add Office</Link></li>
+        )}
       </ul>
     </nav>
   );

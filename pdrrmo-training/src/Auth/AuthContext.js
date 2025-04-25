@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       setUser((prevUser) => ({
         ...prevUser,
         token: data.token,
-        role: data.role || prevUser.role, // Ensure role is preserved or updated
+        role: data.role || prevUser.role,
       }));
       localStorage.setItem("token", data.token);
       localStorage.setItem(
@@ -82,8 +82,10 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    checkAndRefreshToken();
-  }, []);
+    if (user) {
+      checkAndRefreshToken();
+    }
+  }, [user]);
 
   const isAuthenticated = Boolean(user);
 
@@ -91,7 +93,6 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        currentUser: user,
         login,
         logout,
         isAuthenticated,
