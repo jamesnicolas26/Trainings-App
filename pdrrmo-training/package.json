@@ -16,12 +16,12 @@
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },
-  "scripts": {
-    "start": "concurrently \"react-scripts start\" \"cd backend && node server\"",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+"scripts": {
+  "start": "concurrently \"react-scripts start\" \"cd backend && node server\"",
+  "build": "react-scripts build && xcopy /E /I /Y build ..\\backend",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject"
+},
   "eslintConfig": {
     "extends": [
       "react-app",

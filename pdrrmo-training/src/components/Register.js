@@ -159,6 +159,9 @@ const Register = () => {
 
   return (
     <div style={containerStyle}>
+    <br />
+    <br />
+    <br />
       <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Register User</h1>
       <form onSubmit={handleSubmit}>
         <div style={gridStyle}>

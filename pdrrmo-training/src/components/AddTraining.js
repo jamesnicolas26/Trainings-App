@@ -462,7 +462,7 @@ const AddTraining = ({ addTraining }) => {
       {/* Add Office Section (Visible to Superadmins only) */}
       {user?.role === "superadmin" && (
         <div style={{ maxWidth: "600px", margin: "20px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px", boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)" }}>
-          <h3>Add New Office</h3>
+          <h2>Add New Office</h2>
           <form onSubmit={handleAddOffice}>
             <div>
               <label htmlFor="officeName">Office Name</label>
@@ -473,9 +473,10 @@ const AddTraining = ({ addTraining }) => {
                 onChange={(e) => setNewOffice(e.target.value)}
                 placeholder="Enter office name"
                 required
+                style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
               />
             </div>
-            <button type="submit">Add Office</button>
+            <button type="submit" style={{ padding: "10px 20px", backgroundColor: "#007BFF", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}>Add Office</button>
           </form>
         </div>
       )}
