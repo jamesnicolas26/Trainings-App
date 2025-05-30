@@ -1,6 +1,7 @@
 {
   "name": "pdrrmo-training",
   "version": "0.1.0",
+  "homepage": "/pdrrmo-training",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
