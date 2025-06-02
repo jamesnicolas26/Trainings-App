@@ -162,7 +162,7 @@ const Login = () => {
           <p style={{ color: "#7f8c8d" }}>
             Don't have an account yet?{" "}
             <a
-              href="/register"
+              href="pdrrmo-training/register"
               style={{ color: "#3498db", textDecoration: "none" }}
             >
               Register

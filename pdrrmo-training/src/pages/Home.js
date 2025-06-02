@@ -21,14 +21,15 @@ function Home() {
         }}
       >
         <img
-          src="/pdrrmo logo.png" // Replace with the actual logo path
-          alt="PDRRMO Logo"
-          style={{
-            width: "120px",
-            height: "120px",
-            objectFit: "contain",
-          }}
-        />
+      src={`${process.env.PUBLIC_URL}/pdrrmo-logo.png`}
+      alt="PDRRMO Logo"
+      style={{
+      width: "120px",
+      height: "120px",
+      objectFit: "contain",
+  }}
+/>
+
       </div>
 
       <h1
