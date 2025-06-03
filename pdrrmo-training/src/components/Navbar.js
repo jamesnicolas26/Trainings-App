@@ -11,7 +11,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/users", {
+        const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

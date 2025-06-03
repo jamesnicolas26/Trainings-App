@@ -31,7 +31,7 @@ const AddTraining = ({ addTraining }) => {
     const fetchData = async () => {
       try {
         // Fetch training titles without requiring authentication
-        const titlesResponse = await fetch("http://localhost:5000/api/training-titles");
+        const titlesResponse = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/training-titles");
     
         if (!titlesResponse.ok) {
           throw new Error("Failed to fetch training titles");
@@ -44,7 +44,7 @@ const AddTraining = ({ addTraining }) => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Authentication token not found");
     
-        const authorsResponse = await fetch("http://localhost:5000/api/users", {
+        const authorsResponse = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -58,7 +58,7 @@ const AddTraining = ({ addTraining }) => {
         const authorsData = await authorsResponse.json();
         setAuthors(authorsData);
 
-        const officesResponse = await fetch("http://localhost:5000/offices", {
+        const officesResponse = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/offices", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -84,7 +84,7 @@ const AddTraining = ({ addTraining }) => {
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/users", {
+        const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -110,7 +110,7 @@ const AddTraining = ({ addTraining }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication token not found");
 
-      const response = await fetch("http://localhost:5000/api/training-titles", {
+      const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/training-titles", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -209,7 +209,7 @@ const AddTraining = ({ addTraining }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/offices", {
+      const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/offices", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

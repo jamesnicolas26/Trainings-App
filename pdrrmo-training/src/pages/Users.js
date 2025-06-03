@@ -22,7 +22,7 @@ const Users = () => {
           return;
         }
   
-        const response = await fetch("http://localhost:5000/api/users", {
+        const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -82,7 +82,7 @@ const Users = () => {
       console.log("Approving user with ID:", id); // Debugging log
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/users/approve/${id}`,
+        `https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users/approve/${id}`,
         {
           method: "PUT",
           headers: {
@@ -118,7 +118,7 @@ const Users = () => {
       );
       if (!confirmDelete) return;
 
-      const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const response = await fetch(`https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

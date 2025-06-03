@@ -22,7 +22,7 @@ const Register = () => {
   useEffect(() => {
     const fetchOffices = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/offices");
+        const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/offices");
         const data = await response.json();
         setOffices(data.offices || []); // Safely set an empty array if no offices data
       } catch (error) {
@@ -83,7 +83,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/register", {
+      const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

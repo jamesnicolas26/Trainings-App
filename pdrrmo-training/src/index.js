@@ -10,7 +10,7 @@ const AppWrapper = () => {
   const location = useLocation();
 
   // Specify the routes where the navbar should not appear
-  const hideNavbarRoutes = ["/", "/addtraining", "/edituser/:id"];
+  const hideNavbarRoutes = ["/", "/addtraining", "/edituser/:id", "/register"];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return (
@@ -23,7 +23,7 @@ const AppWrapper = () => {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <Router basename="/pdrrmo-training">
+  <Router>
   <AuthProvider>
     <AppWrapper />
   </AuthProvider>

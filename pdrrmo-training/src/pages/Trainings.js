@@ -168,7 +168,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
         if (!token) return;
 
         try {
-          const response = await fetch("http://localhost:5000/api/user/profile", {
+          const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/user/profile", {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
           });

@@ -29,7 +29,7 @@ const EditUser = ({ updateUser }) => {
           return;
         }
   
-        const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+        const response = await fetch(`https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users/${id}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -90,7 +90,7 @@ const EditUser = ({ updateUser }) => {
       }
   
       // Send PUT request to the backend
-      const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const response = await fetch(`https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
