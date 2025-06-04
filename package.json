@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "concurrently \"cd pdrrmo-training && npm start\" \"cd pdrrmo-backend && npm start\"",
-    "build": "npm run build-frontend && npm run build-backend && npm run combine-builds",
-    "build-frontend": "cd pdrrmo-training && npm run build",
-    "build-backend": "cd pdrrmo-backend && npm run build",
-    "combine-builds": "node combine-builds.js"
+    "build": "npm run build-frontend",
+    "build-frontend": "cd pdrrmo-training && npm run build"
   },
   "dependencies": {
     "build": "^0.1.4",
