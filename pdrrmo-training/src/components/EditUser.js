@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
 const EditUser = ({ updateUser }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ const EditUser = ({ updateUser }) => {
           return;
         }
   
-        const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/users/${id}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -90,7 +92,7 @@ const EditUser = ({ updateUser }) => {
       }
   
       // Send PUT request to the backend
-      const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

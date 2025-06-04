@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -22,7 +24,7 @@ const Users = () => {
           return;
         }
   
-        const response = await fetch("http://localhost:5000/api/users", {
+        const response = await fetch(`${API_BASE_URL}/api/users`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -82,7 +84,7 @@ const Users = () => {
       console.log("Approving user with ID:", id); // Debugging log
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/users/approve/${id}`,
+        `${API_BASE_URL}/api/users/approve/${id}`,
         {
           method: "PUT",
           headers: {
@@ -118,7 +120,7 @@ const Users = () => {
       );
       if (!confirmDelete) return;
 
-      const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

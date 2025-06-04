@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
 const Navbar = () => {
   const [userRole, setUserRole] = useState(null);
   const location = useLocation();
@@ -11,7 +13,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/users", {
+        const response = await fetch(`${API_BASE_URL}/api/users`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -27,7 +29,7 @@ const Navbar = () => {
   }, []);
 
   // Hide navbar on specific pages
-  const hideNavbar = location.pathname.startsWith("/edituser/");
+  const hideNavbar = location.pathname.startsWith(["/edituser/", "/register"]);
   if (hideNavbar) {
     return null;
   }

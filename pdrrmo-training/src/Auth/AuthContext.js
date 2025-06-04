@@ -1,5 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -36,7 +38,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      const response = await fetch("http://localhost:5000/api/auth/refresh-token", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

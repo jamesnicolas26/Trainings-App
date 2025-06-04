@@ -5,6 +5,8 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 import PropTypes from "prop-types";
 import { useAuth } from "../Auth/AuthContext";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
 const Trainings = ({ trainings, deleteTraining }) => {
   const { user } = useAuth(); // Access the user from AuthContext
   const [userRole, setUserRole] = useState(user?.role || ""); // Default to user role from context
@@ -168,7 +170,7 @@ const Trainings = ({ trainings, deleteTraining }) => {
         if (!token) return;
 
         try {
-          const response = await fetch("http://localhost:5000/api/user/profile", {
+          const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
           });

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -22,7 +24,7 @@ const Register = () => {
   useEffect(() => {
     const fetchOffices = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/offices");
+        const response = await fetch(`${API_BASE_URL}/api/offices`);
         const data = await response.json();
         setOffices(data.offices || []); // Safely set an empty array if no offices data
       } catch (error) {
@@ -83,7 +85,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/register", {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

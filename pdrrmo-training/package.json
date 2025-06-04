@@ -18,8 +18,8 @@
     "xlsx": "^0.18.5"
   },
 "scripts": {
-  "start": "concurrently \"react-scripts start\" \"cd backend && node server\"",
-  "build": "react-scripts build && xcopy /E /I /Y build ..\\backend",
+  "start": "concurrently \"react-scripts start\" \"cd ../pdrrmo-backend && node server\"",
+  "build": "react-scripts build",
   "test": "react-scripts test",
   "eject": "react-scripts eject"
 },

@@ -1,18 +1,25 @@
 {
-    "name": "pdrrmo",
-    "version": "1.0.0",
-    "description": "A project for PDRRMO",
-    "main": "index.js",
-    "scripts": {
-      "start": "concurrently \"cd pdrrmo-training && npm start\" \"cd pdrrmo-backend && npm start\"",
-      "build": "npm run build-frontend && npm run build-backend && xcopy pdrrmo-training\\build pdrrmo-backend\\build /E /I /Y",
-      "build-frontend": "cd pdrrmo-training && npm run build",
-      "build-backend": "cd pdrrmo-backend && npm run build"
-    },
-    "dependencies": {
-      "build": "^0.1.4",
-      "concurrently": "^9.1.2",
-      "webpack": "^5.99.6"
-    }
+  "name": "pdrrmo",
+  "version": "1.0.0",
+  "description": "A project for PDRRMO",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"cd pdrrmo-training && npm start\" \"cd pdrrmo-backend && npm start\"",
+    "build": "npm run build-frontend && npm run build-backend && npm run combine-builds",
+    "build-frontend": "cd pdrrmo-training && npm run build",
+    "build-backend": "cd pdrrmo-backend && npm run build",
+    "combine-builds": "node combine-builds.js"
+  },
+  "dependencies": {
+    "build": "^0.1.4",
+    "concurrently": "^9.1.2",
+    "fs-extra": "^11.3.0",
+    "webpack": "^5.99.9"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "babel-loader": "^10.0.0",
+    "webpack-node-externals": "^3.0.0"
   }
-  
+}
