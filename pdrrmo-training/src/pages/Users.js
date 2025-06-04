@@ -24,7 +24,11 @@ const Users = () => {
           return;
         }
   
+<<<<<<< HEAD
         const response = await fetch(`${API_BASE_URL}/api/users`, {
+=======
+        const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users", {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -84,7 +88,11 @@ const Users = () => {
       console.log("Approving user with ID:", id); // Debugging log
       const token = localStorage.getItem("token");
       const response = await fetch(
+<<<<<<< HEAD
         `${API_BASE_URL}/api/users/approve/${id}`,
+=======
+        `https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users/approve/${id}`,
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
         {
           method: "PUT",
           headers: {
@@ -120,7 +128,11 @@ const Users = () => {
       );
       if (!confirmDelete) return;
 
+<<<<<<< HEAD
       const response = await fetch(`${API_BASE_URL}/api/users/${id}`, {
+=======
+      const response = await fetch(`https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users/${id}`, {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

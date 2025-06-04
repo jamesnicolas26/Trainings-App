@@ -30,7 +30,11 @@ const Login = () => {
     }
   
     try {
+<<<<<<< HEAD
       const response = await fetch(`${API_BASE_URL}/login`, {
+=======
+      const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/login", {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +168,7 @@ const Login = () => {
           <p style={{ color: "#7f8c8d" }}>
             Don't have an account yet?{" "}
             <a
-              href="pdrrmo-training/register"
+              href="/register"
               style={{ color: "#3498db", textDecoration: "none" }}
             >
               Register

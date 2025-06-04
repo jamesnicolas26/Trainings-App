@@ -13,6 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+<<<<<<< HEAD
 app.use(cors({
   origin: ["http://localhost:3000", 
   "https://pdrrmo.bulacan.gov.ph",
@@ -25,6 +26,9 @@ app.use(cors({
 app.options("*", cors());
 
  // Allow requests from the frontend
+=======
+app.use(cors({ origin: "https://pdrrmo.bulacan.gov.ph/pdrrmo-training/" })); // Allow requests from the frontend
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
 app.use(express.json());
 
 // Serve the frontend build files

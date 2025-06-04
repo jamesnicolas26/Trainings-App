@@ -38,7 +38,11 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
+<<<<<<< HEAD
       const response = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
+=======
+      const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/auth/refresh-token", {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
         method: "POST",
         headers: {
           "Content-Type": "application/json",

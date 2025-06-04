@@ -33,7 +33,11 @@ const AddTraining = ({ addTraining }) => {
     const fetchData = async () => {
       try {
         // Fetch training titles without requiring authentication
+<<<<<<< HEAD
         const titlesResponse = await fetch(`${API_BASE_URL}/api/training-titles`);
+=======
+        const titlesResponse = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/training-titles");
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
     
         if (!titlesResponse.ok) {
           throw new Error("Failed to fetch training titles");
@@ -46,7 +50,11 @@ const AddTraining = ({ addTraining }) => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Authentication token not found");
     
+<<<<<<< HEAD
         const authorsResponse = await fetch(`${API_BASE_URL}/api/users`, {
+=======
+        const authorsResponse = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users", {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -60,7 +68,11 @@ const AddTraining = ({ addTraining }) => {
         const authorsData = await authorsResponse.json();
         setAuthors(authorsData);
 
+<<<<<<< HEAD
         const officesResponse = await fetch(`${API_BASE_URL}/offices`, {
+=======
+        const officesResponse = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/offices", {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -86,7 +98,11 @@ const AddTraining = ({ addTraining }) => {
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
+<<<<<<< HEAD
         const response = await fetch(`${API_BASE_URL}/api/users`, {
+=======
+        const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users", {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -112,7 +128,11 @@ const AddTraining = ({ addTraining }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication token not found");
 
+<<<<<<< HEAD
       const response = await fetch(`${API_BASE_URL}/api/training-titles`, {
+=======
+      const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/training-titles", {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -211,7 +231,11 @@ const AddTraining = ({ addTraining }) => {
     }
 
     try {
+<<<<<<< HEAD
       const response = await fetch(`${API_BASE_URL}/api/offices`, {
+=======
+      const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/offices", {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
         method: "POST",
         headers: {
           "Content-Type": "application/json",
