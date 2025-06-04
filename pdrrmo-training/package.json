@@ -11,18 +11,27 @@
     "cross-env": "^7.0.3",
     "lucide-react": "^0.479.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react-dom": "^19.1.0",
     "react-router-dom": "^7.2.0",
     "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },
+<<<<<<< HEAD
 "scripts": {
   "start": "concurrently \"react-scripts start\" \"cd ../pdrrmo-backend && node server\"",
   "build": "react-scripts build",
   "test": "react-scripts test",
   "eject": "react-scripts eject"
 },
+=======
+  "scripts": {
+    "start": "concurrently \"react-scripts start\" \"cd backend && node server\"",
+    "build": "react-scripts build && move build ../build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
   "eslintConfig": {
     "extends": [
       "react-app",

@@ -31,7 +31,11 @@ const EditUser = ({ updateUser }) => {
           return;
         }
   
+<<<<<<< HEAD
         const response = await fetch(`${API_BASE_URL}/api/users/${id}`, {
+=======
+        const response = await fetch(`https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users/${id}`, {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -92,7 +96,11 @@ const EditUser = ({ updateUser }) => {
       }
   
       // Send PUT request to the backend
+<<<<<<< HEAD
       const response = await fetch(`${API_BASE_URL}/api/users/${id}`, {
+=======
+      const response = await fetch(`https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/users/${id}`, {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

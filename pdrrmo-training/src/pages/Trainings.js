@@ -170,7 +170,11 @@ const Trainings = ({ trainings, deleteTraining }) => {
         if (!token) return;
 
         try {
+<<<<<<< HEAD
           const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
+=======
+          const response = await fetch("https://pdrrmo.bulacan.gov.ph/pdrrmo-training/api/user/profile", {
+>>>>>>> 21c6ebde26bb8c8c4914e84f2bfbefe7088de331
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
           });
